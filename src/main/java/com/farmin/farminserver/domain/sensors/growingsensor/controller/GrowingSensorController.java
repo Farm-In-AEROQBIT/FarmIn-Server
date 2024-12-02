@@ -42,4 +42,16 @@ public class GrowingSensorController {
         growingSensorService.deleteGrowingSensor(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<List<GrowingSensorResponse>> getStatistics(
+            @RequestParam(defaultValue = "yearly") String type, // 기본값 설정
+            @RequestParam(required = false) String year,
+            @RequestParam(required = false) String month,
+            @RequestParam(required = false) String weekOrDay
+    ) {
+        List<GrowingSensorResponse> responses = growingSensorService.getStatistics(type, year, month, weekOrDay);
+        return ResponseEntity.ok(responses);
+    }
+
 }

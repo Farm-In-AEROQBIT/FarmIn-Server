@@ -29,43 +29,70 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private final UserRepository userRepository;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String uri = request.getRequestURI();
-        if (uri.contains("/open-api") || uri.contains("/swagger-ui") || uri.contains("/v3/api-docs")|| uri.contains("/static")) {
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+
+        // 인증이 필요 없는 경로들을 추가
+        return path.equals("/") || // 루트 경로
+                path.startsWith("/open-api/user/join") || // 회원가입 경로
+                path.startsWith("/open-api/user/login") || // 로그인 경로
+                path.contains("/ftp-service") || // FTP 서비스
+                path.startsWith("/actuator/") || // Spring Actuator
+                path.equals("/favicon.ico") || // Favicon 요청
+                path.startsWith("/robots.txt"); // robots.txt 요청
+    }
+
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+
+        log.info("Request URI: {}", request.getRequestURI());
+        log.info("Request Method: {}", request.getMethod());
+        log.info("Authorization Header: {}", request.getHeader("Authorization"));
+
+        // 인증 불필요 경로는 필터를 통과시킴
+        String path = request.getRequestURI();
+        if (path.equals("/") || path.equals("/favicon.ico") || path.startsWith("/open-api")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String jwtToken= null;
-        String subject = null;
-        //Authorization 요청 헤더 존재 여부를 확인하고, 헤더 정보를 추출
-        String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        try {
+            String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        //    authorizationHeader의 값이 Bearer로 시작하는지 확인 후 추출
-        if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
-            jwtToken = authorizationHeader.substring(7);
-            subject = jwtUtils.getSubjectFromToken(jwtToken);
-            log.debug("jwt : ",jwtToken);
-        }else{
-            log.error("Authorization 헤더 누락 또는 토큰 형식 오류");
-            throw new ApiException(ErrorCode.UNAUTHORIZED,"Authorization 헤더 누락 또는 토큰 형식 오류");
-        }
-        // 현재 로그인된 사용자의 username과 토큰에 포함된 username 비교
-        if(subject != null && SecurityContextHolder.getContext().getAuthentication() == null){
-            UserEntity entity = userRepository.findByUsername(subject);
-            log.debug(entity.getUsername());
-            if(jwtUtils.validateToken(jwtToken,entity)){
-                //SecurityContextHolder에 userdetail 정보 저장
-                CustomUserDetail customUserDetail = new CustomUserDetail(entity);
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(customUserDetail, null, customUserDetail.getAuthorities());
-                usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-            }else{
-                SecurityContextHolder.getContext().setAuthentication(null);
-                return;
+            // Authorization 헤더가 없거나 Bearer 토큰이 아니면 예외 처리
+            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+                log.warn("Authorization 헤더 누락 또는 토큰 형식 오류 - 경로: {}", request.getRequestURI());
+                throw new ApiException(ErrorCode.UNAUTHORIZED, "Authorization 헤더 누락 또는 토큰 형식 오류");
             }
-            filterChain.doFilter(request,response);
+
+            String jwtToken = authorizationHeader.substring(7);
+            String subject = jwtUtils.getSubjectFromToken(jwtToken);
+
+            if (subject != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserEntity entity = userRepository.findByUsername(subject);
+                if (entity != null && jwtUtils.validateToken(jwtToken, entity)) {
+                    CustomUserDetail customUserDetail = new CustomUserDetail(entity);
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(customUserDetail, null, customUserDetail.getAuthorities());
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            }
+        } catch (ApiException e) {
+            // SecurityContext를 클리어하고 API 예외를 다시 던짐
+            SecurityContextHolder.clearContext();
+            log.warn("인증 오류: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            // 기타 예외 처리
+            SecurityContextHolder.clearContext();
+            log.error("JWT 처리 중 오류 발생 - 경로: {}", request.getRequestURI(), e);
+            throw new ApiException(ErrorCode.UNAUTHORIZED, "인증 처리 중 오류가 발생했습니다");
         }
 
+        // 다음 필터 체인 실행
+        filterChain.doFilter(request, response);
     }
 }

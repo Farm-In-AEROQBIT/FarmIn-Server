@@ -28,22 +28,24 @@ public class SecurityConfig{
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
-        httpSecurity.authorizeHttpRequests((auth)->{
-            auth.requestMatchers("/**").permitAll()
-                    .anyRequest().authenticated();
-        });
+        httpSecurity.authorizeHttpRequests((auth) -> auth
+                .requestMatchers("/", "/favicon.ico", "/robots.txt", "/index.html", "/open-api/**").permitAll() // 인증 불필요 경로
+                .anyRequest().authenticated() // 나머지 경로는 인증 필요
+        );
+
         httpSecurity.cors(withDefaults());
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
         httpSecurity.formLogin(AbstractHttpConfigurer::disable);
         httpSecurity.httpBasic(AbstractHttpConfigurer::disable);
-        httpSecurity.sessionManagement((auth)->{
-            auth.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        });
+        httpSecurity.sessionManagement((auth) -> auth
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // JWT를 사용하므로 세션 비활성화
+        );
 
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
     }
+
 
     @Bean
     BCryptPasswordEncoder bCryptPasswordEncoder() {
