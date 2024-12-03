@@ -53,10 +53,11 @@ public class FTPSendProcessor {
         }
     }
 
-    @Scheduled(fixedRate = 600000) // 10분마다 실행
+    @Scheduled(fixedRate = 600000, initialDelay = 10000) // 10분마다 실행
     public void generateAndSendLogFiles() {
         for (int i = 0; i < EQUIPMENT_CODES.length; i++) {
             try {
+                System.out.println("Processing equipment code: " + EQUIPMENT_CODES[i]); // 디버깅용 로그 추가
                 String filename = generateLogFile(EQUIPMENT_CODES[i], SENSOR_COLUMNS[i]);
                 if (filename != null) {
                     uploadFileToFTP(filename);
@@ -108,21 +109,27 @@ public class FTPSendProcessor {
     private List<SensorData> fetchSensorData(Connection conn, String sensorColumn) {
         List<SensorData> sensorDataList = new ArrayList<>();
         String sql = "SELECT GrowingID, Time, " + sensorColumn +
-                " FROM GrowingSensor WHERE " + sensorColumn + " IS NOT NULL ORDER BY Time DESC LIMIT 3";
+                " FROM GrowingSensor WHERE " + sensorColumn + " IS NOT NULL AND DATE(Time) = CURDATE() ORDER BY Time";
+
+        System.out.println("Executing SQL: " + sql); // SQL 쿼리 로깅
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
 
+            // 쿼리 결과 로깅 추가
+            int rowCount = 0;
             while (rs.next()) {
+                rowCount++;
                 SensorData data = new SensorData();
                 data.eqpmnNo = String.format("1-%d번", rs.getInt("GrowingID"));
                 data.mesureDt = rs.getString("Time");
                 data.mesureVal01 = rs.getString(sensorColumn);
                 sensorDataList.add(data);
 
-                // 데이터 로깅
                 System.out.println("센서 데이터 추출: " + data.eqpmnNo + ", " + data.mesureDt + ", " + data.mesureVal01);
             }
+
+            System.out.println("Total rows fetched for " + sensorColumn + ": " + rowCount);
 
             if (sensorDataList.isEmpty()) {
                 System.err.println(sensorColumn + " 센서의 데이터가 없습니다.");
@@ -179,12 +186,6 @@ public class FTPSendProcessor {
                 boolean uploaded = ftpClient.storeFile(filename, fileInputStream);
                 if (uploaded) {
                     System.out.println("파일 업로드 성공: " + filename);
-
-                    // 업로드 성공 시 로컬 파일 삭제
-                    File localFile = new File(localFilePath);
-                    if (localFile.delete()) {
-                        System.out.println("로컬 파일 삭제 성공: " + filename);
-                    }
                 } else {
                     System.err.println("파일 업로드 실패: " + filename);
                 }

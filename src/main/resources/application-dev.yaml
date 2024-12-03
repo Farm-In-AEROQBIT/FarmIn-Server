@@ -4,6 +4,11 @@ spring:
     username: root
     password: ${DEV_DB_PASSWORD}
     driverClassName: com.mysql.cj.jdbc.Driver
+  task:
+    scheduling:
+      pool:
+        size: 10
+        thread-name-prefix: "scheduled-task-"
   jpa:
     show-sql: true
     properties:
@@ -33,6 +38,9 @@ spring:
 
   logging:
     level:
+      root: INFO
+      org.springframework: DEBUG
+      com.farmin.farminserver: DEBUG
       org.springframework.web: DEBUG
 
 jwt:
