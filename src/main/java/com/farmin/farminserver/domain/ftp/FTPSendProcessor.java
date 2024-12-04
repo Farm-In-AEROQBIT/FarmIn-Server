@@ -13,11 +13,16 @@ import java.util.List;
 
 @Service
 public class FTPSendProcessor {
-    private static final String FTP_SERVER = "farm-in.ipdisk.co.kr";
-    private static final int FTP_PORT = 21;
-    private static final String FTP_USER = "farmin";
+    private static final String FTP_SERVER = "106.10.49.73";
+    private static final int FTP_PORT = 9021;
+    private static final String FTP_USER = "yuhan0";
     private static final String FTP_PASSWORD = "farmin230130";
-    private static final String FTP_UPLOAD_DIRECTORY = "/HDD1/TEST";
+    private static final String FTP_UPLOAD_DIRECTORY = "/";
+//    private static final String FTP_SERVER = "farm-in.ipdisk.co.kr";
+//    private static final int FTP_PORT = 21;
+//    private static final String FTP_USER = "farmin";
+//    private static final String FTP_PASSWORD = "farmin230130";
+//    private static final String FTP_UPLOAD_DIRECTORY = "/HDD1/TEST";
 
     private static final String LOCAL_LOG_DIRECTORY = "/home/farmin/바탕화면/KIFAPQE";
 
@@ -29,7 +34,7 @@ public class FTPSendProcessor {
     private static final String[] SENSOR_COLUMNS = {"Temper", "Humidity", "Co2", "Nh3"};
 
     private static final String MAKER_ID = "yuhan0";
-    private static final String LSIND_REGIST_NO = "TEST1";
+    private static final String LSIND_REGIST_NO = "TEST01";
     private static final String ITEM_CODE = "P00";
     private static final String STALL_TY_CODE = "SP06";
 
