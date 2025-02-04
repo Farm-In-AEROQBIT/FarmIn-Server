@@ -1,4 +1,4 @@
-package com.farmin.farminserver.domain.ftp;
+package com.farmin.farminserver.domain.ftp.catm1ftp;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class FTPSendProcessor {
+public class Catm1FTPSendProcessor {
     private static final String FTP_SERVER = "106.10.49.73";
     private static final int FTP_PORT = 9021;
     private static final String FTP_USER = "yuhan0";
@@ -50,7 +50,7 @@ public class FTPSendProcessor {
         }
     }
 
-    public FTPSendProcessor() {
+    public Catm1FTPSendProcessor() {
         File directory = new File(LOCAL_LOG_DIRECTORY);
         if (!directory.exists()) {
             boolean created = directory.mkdirs();

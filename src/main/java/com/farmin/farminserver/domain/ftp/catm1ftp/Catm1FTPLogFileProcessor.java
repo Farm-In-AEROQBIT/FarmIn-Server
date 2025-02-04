@@ -1,4 +1,4 @@
-package com.farmin.farminserver.domain.ftp;
+package com.farmin.farminserver.domain.ftp.catm1ftp;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
@@ -19,13 +19,13 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Service
-public class FTPLogFileProcessor {
+public class Catm1FTPLogFileProcessor {
     // FTP 설정
     private static final String FTP_SERVER = "farm-in.ipdisk.co.kr";
     private static final String FTP_USER = "farmin";
     private static final String FTP_PASSWORD = "farmin230130";
-    private static final String FTP_LOG_DIRECTORY = "/HDD1/monitoring/fi1030";
-    private static final String LOCAL_SAVE_DIRECTORY = "/home/farmin/바탕화면/log";
+    private static final String FTP_LOG_DIRECTORY = "/HDD1/LoRa/fi1030";
+    private static final String LOCAL_SAVE_DIRECTORY = "/home/farmin/바탕화면/Catm1";
 
     // DB 설정
     private static final String DB_URL = "jdbc:mysql://192.168.0.20:3306/FarmIn";
@@ -38,7 +38,7 @@ public class FTPLogFileProcessor {
     private final Set<String> processedTimestamps = Collections.synchronizedSet(new HashSet<>());
     private String tableName = "GrowingSensor";
 
-    public FTPLogFileProcessor() {
+    public Catm1FTPLogFileProcessor() {
         initialProcess();
     }
 
