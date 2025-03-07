@@ -18,8 +18,9 @@ public enum ErrorCode implements ErrorCodeIfs{
     //null
     NULL_POINT(HttpStatus.INTERNAL_SERVER_ERROR.value(), 512,"Null point"),
     //인증 실패
-    UNAUTHORIZED(HttpStatus.UNAUTHORIZED.value(),401,"UNAUTHORIZED")
-    ;
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED.value(),401,"UNAUTHORIZED"),
+    // 리소스를 찾을 수 없음
+    NOT_FOUND(HttpStatus.NOT_FOUND.value(), 404,"Resource Not Found");
 
     private final Integer httpStatusCode;
     private final Integer errorCode;

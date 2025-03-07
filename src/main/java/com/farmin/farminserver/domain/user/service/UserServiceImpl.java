@@ -10,9 +10,11 @@ import com.farmin.farminserver.domain.user.dto.LoginResponse;
 import com.farmin.farminserver.domain.user.mapper.UserMapper;
 import com.farmin.farminserver.entity.user.UserEntity;
 import com.farmin.farminserver.entity.user.UserRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -50,5 +52,22 @@ public class UserServiceImpl implements UserService{
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    // 관리자만 사용자 목록 조회 가능
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<UserEntity> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    // 관리자만 사용자 삭제 가능
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteUser(Integer userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new ApiException(ErrorCode.NOT_FOUND, "해당 유저를 찾을 수 없습니다.");
+        }
+        userRepository.deleteById(userId);
     }
 }

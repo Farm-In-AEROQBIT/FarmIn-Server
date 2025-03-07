@@ -1,12 +1,12 @@
 package com.farmin.farminserver.config;
 
-import lombok.RequiredArgsConstructor;
 import com.farmin.farminserver.filter.JwtRequestFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -17,35 +17,28 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity // ✅ @PreAuthorize 활성화 (Spring Boot 3.3 이상)
 @RequiredArgsConstructor
-public class SecurityConfig{
+public class SecurityConfig {
     private final JwtRequestFilter jwtRequestFilter;
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-
-        httpSecurity.authorizeHttpRequests((auth) -> auth
-                .requestMatchers("/", "/favicon.ico", "/robots.txt", "/index.html", "/open-api/**").permitAll() // 인증 불필요 경로
-                .anyRequest().authenticated() // 나머지 경로는 인증 필요
-        );
-
-        httpSecurity.cors(withDefaults());
-        httpSecurity.csrf(AbstractHttpConfigurer::disable);
-        httpSecurity.formLogin(AbstractHttpConfigurer::disable);
-        httpSecurity.httpBasic(AbstractHttpConfigurer::disable);
-        httpSecurity.sessionManagement((auth) -> auth
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // JWT를 사용하므로 세션 비활성화
-        );
-
-        httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        httpSecurity
+                .csrf(csrf -> csrf.disable())  // CSRF 보호 비활성화 (JWT 사용 시 필요 없음)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // ✅ JWT 사용을 위한 세션 관리 비활성화
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/favicon.ico", "/robots.txt", "/index.html", "/open-api/**").permitAll() // ✅ 인증 필요 없는 경로
+                        .requestMatchers("/admin/**").hasRole("ADMIN") // ✅ 관리자 전용 API 보호
+                        .anyRequest().authenticated() // ✅ 나머지 경로는 인증 필요
+                )
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // ✅ JWT 필터 추가
 
         return httpSecurity.build();
     }
-
 
     @Bean
     BCryptPasswordEncoder bCryptPasswordEncoder() {
