@@ -24,8 +24,7 @@ public class Catm1FTPSendProcessor {
 //    private static final String FTP_PASSWORD = "farmin230130";
 //    private static final String FTP_UPLOAD_DIRECTORY = "/HDD1/TEST";
 
-    private static final String LOCAL_LOG_DIRECTORY = "/home/farmin/바탕화면/KIFAPQE";
-
+    private static final String LOCAL_LOG_DIRECTORY = "/home/farmin/바탕화면/Catm1/jsonlog";
     private static final String DB_URL = "jdbc:mysql://192.168.0.20:3306/FarmIn";
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "230130";
@@ -63,7 +62,7 @@ public class Catm1FTPSendProcessor {
         for (int i = 0; i < EQUIPMENT_CODES.length; i++) {
             try {
                 System.out.println("Processing equipment code: " + EQUIPMENT_CODES[i]); // 디버깅용 로그 추가
-                String filename = generateLogFile(EQUIPMENT_CODES[i], SENSOR_COLUMNS[i]);
+                String filename = generateLogFile(EQUIPMENT_CODES[i], SENSOR_COLUMNS[i]);   
                 if (filename != null) {
                     uploadFileToFTP(filename);
                 } else {

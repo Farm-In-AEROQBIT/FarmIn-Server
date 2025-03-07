@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService{
     public LoginResponse login(LoginRequest loginRequest) {
         UserEntity userEntity = Optional.ofNullable(userRepository.findByUsername(loginRequest.getUsername()))
                 .orElseThrow(()->new ApiException(ErrorCode.BAD_REQUEST,"없는 회원입니다."));
-        //바말번호 확인
+        //비밀번호 확인
         boolean passwordMatch = bCryptPasswordEncoder.matches(loginRequest.getPassword(), userEntity.getPassword());
         if (!passwordMatch) {
             throw new ApiException(ErrorCode.BAD_REQUEST, "비밀번호가 틀렸습니다.");
