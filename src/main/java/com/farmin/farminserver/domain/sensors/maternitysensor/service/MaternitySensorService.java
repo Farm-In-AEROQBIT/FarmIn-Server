@@ -11,4 +11,7 @@ public interface MaternitySensorService {
     MaternitySensorResponse getMaternitySensorById(int id);
     MaternitySensorResponse updateMaternitySensor(int id, MaternitySensorRequest request);
     void deleteMaternitySensor(int id);
+
+    // 추가된 메서드
+    List<MaternitySensorResponse> getStatistics(String type, String year, String month, String weekOrDay);
 }

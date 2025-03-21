@@ -11,4 +11,7 @@ public interface ReserveSensorService {
     ReserveSensorResponse getReserveSensorById(int id);
     ReserveSensorResponse updateReserveSensor(int id, ReserveSensorRequest request);
     void deleteReserveSensor(int id);
+
+    // 추가된 메서드
+    List<ReserveSensorResponse> getStatistics(String type, String year, String month, String weekOrDay);
 }

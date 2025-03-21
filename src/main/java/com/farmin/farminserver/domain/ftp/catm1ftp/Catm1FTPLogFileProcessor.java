@@ -10,8 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,10 +17,11 @@ import java.util.concurrent.Executors;
 @Service
 public class Catm1FTPLogFileProcessor {
     // FTP 설정
-    private static final String FTP_SERVER = "farm-in.ipdisk.co.kr";
+    private static final String FTP_SERVER = "118.42.54.88";
+    private static final int FTP_PORT = 2301;
     private static final String FTP_USER = "farmin";
-    private static final String FTP_PASSWORD = "farmin230130";
-    private static final String FTP_LOG_DIRECTORY = "/HDD1/LoRa/fi1030";
+    private static final String FTP_PASSWORD = "230130";
+    private static final String FTP_LOG_DIRECTORY = "/home/farmin/ftp/modem";
     private static final String LOCAL_SAVE_DIRECTORY = "/home/farmin/바탕화면/Catm1/log";
 
     // DB 설정
@@ -30,10 +29,9 @@ public class Catm1FTPLogFileProcessor {
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "230130";
 
-    private final ExecutorService dbExecutor = Executors.newSingleThreadExecutor();
+    private final ExecutorService dbExecutor = Executors.newFixedThreadPool(5);
     private volatile boolean isProcessing = false;
     private final Set<String> processedFiles = Collections.synchronizedSet(new HashSet<>());
-    private final Set<String> processedTimestamps = Collections.synchronizedSet(new HashSet<>());
 
     private static final Map<String, String> SENSOR_TABLE_MAPPING = Map.of(
             "BoarsSensor", "BoarsID",
@@ -45,23 +43,19 @@ public class Catm1FTPLogFileProcessor {
             "ReserveSensor", "ReserveID"
     );
 
-    private String tableName = "GrowingSensor";
-
+    // 초기 실행 처리
     public Catm1FTPLogFileProcessor() {
         initialProcess();
     }
 
     private void initialProcess() {
-        try {
-            if (downloadFTPFiles(true)) {
-                convertAllLogFiles();
-                processAllCSVFiles();
-            } else {
-                System.out.println("초기 FTP 다운로드 실패");
-            }
-        } catch (Exception e) {
-            System.out.println("초기 처리 중 오류 발생");
-            e.printStackTrace();
+        System.out.println("[초기 실행] 데이터 다운로드 및 처리 시작");
+        if (downloadAllDirectories()) {
+            convertAllLogFiles();
+            processAllCSVFiles();
+            System.out.println("[초기 실행] 데이터 다운로드 및 처리 완료");
+        } else {
+            System.err.println("[초기 실행] 데이터 다운로드 실패");
         }
     }
 
@@ -70,9 +64,13 @@ public class Catm1FTPLogFileProcessor {
         if (!isProcessing) {
             try {
                 isProcessing = true;
-                if (downloadFTPFiles(false)) {
+                System.out.println("[스케줄러] 데이터 다운로드 및 처리 시작");
+                if (downloadAllDirectories()) {
                     convertAllLogFiles();
                     processAllCSVFiles();
+                    System.out.println("[스케줄러] 데이터 다운로드 및 처리 완료");
+                } else {
+                    System.err.println("[스케줄러] 데이터 다운로드 실패");
                 }
             } finally {
                 isProcessing = false;
@@ -80,184 +78,126 @@ public class Catm1FTPLogFileProcessor {
         }
     }
 
-    private int getBarnIdFromDB(int sensorId, String tableName) {
-        String barnColumn = tableName.replace("Sensor", "ID"); // BoarsSensor → BoarsID, FinishingSensor → FinishingID
-        return getRelatedId(barnColumn, tableName, "SensorID", sensorId);
-    }
+    private boolean downloadAllDirectories() {
+        int attempt = 0;
+        while (attempt < 3) {
+            attempt++;
+            FTPClient ftpClient = new FTPClient();
+            boolean success = false;
 
-    private boolean downloadFTPFiles(boolean downloadAll) {
-        FTPClient ftpClient = new FTPClient();
-        boolean success = false;
-
-        try {
-            ftpClient.connect(FTP_SERVER);
-            boolean login = ftpClient.login(FTP_USER, FTP_PASSWORD);
-            if (!login) {
-                System.out.println("FTP 로그인 실패");
-                return false;
-            }
-
-            ftpClient.enterLocalPassiveMode();
-            ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
-            Files.createDirectories(Paths.get(LOCAL_SAVE_DIRECTORY));
-
-            if (!ftpClient.changeWorkingDirectory(FTP_LOG_DIRECTORY)) {
-                System.out.println("FTP 디렉토리 변경 실패: " + FTP_LOG_DIRECTORY);
-                return false;
-            }
-
-            FTPFile[] logFiles = ftpClient.listFiles();
-            if (logFiles != null && logFiles.length > 0) {
-                for (FTPFile logFile : logFiles) {
-                    if (logFile.getName().endsWith(".log")) {
-                        downloadFile(ftpClient, logFile);
-                    }
-                }
-                success = true;
-            }
-        } catch (IOException e) {
-            System.out.println("FTP 파일 다운로드 중 오류 발생");
-            e.printStackTrace();
-        } finally {
             try {
-                if (ftpClient.isConnected()) {
+                ftpClient.connect(FTP_SERVER, FTP_PORT);
+                boolean login = ftpClient.login(FTP_USER, FTP_PASSWORD);
+                if (!login) {
+                    System.err.println("[FTP] 로그인 실패 (시도 " + attempt + "회)");
+                    continue;
+                }
+
+                ftpClient.enterLocalPassiveMode();
+                ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
+
+                downloadDirectory(ftpClient, FTP_LOG_DIRECTORY, LOCAL_SAVE_DIRECTORY);
+                success = true;
+                System.out.println("[FTP] 데이터 다운로드 성공");
+                return true;
+
+            } catch (IOException e) {
+                System.err.println("[FTP] 다운로드 중 오류 발생 (시도 " + attempt + "회)");
+                e.printStackTrace();
+            } finally {
+                try {
                     ftpClient.logout();
                     ftpClient.disconnect();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+
+            if (success) return true;
         }
-        return success;
+        System.err.println("[FTP] 모든 시도 실패 - 다운로드 중단");
+        return false;
     }
 
     private void convertAllLogFiles() {
-        File directory = new File(LOCAL_SAVE_DIRECTORY);
-        File[] logFiles = directory.listFiles((dir, name) -> name.endsWith(".log"));
-
-        if (logFiles != null && logFiles.length > 0) {
-            Arrays.stream(logFiles).forEach(this::convertLogToCSV);
+        try {
+            Files.walk(Paths.get(LOCAL_SAVE_DIRECTORY))
+                    .filter(Files::isRegularFile)
+                    .filter(path -> path.toString().endsWith(".log"))
+                    .forEach(this::convertLogToCSV);
+        } catch (IOException e) {
+            System.err.println("[변환 오류] 로그 파일 변환 중 오류 발생");
+            e.printStackTrace();
         }
     }
 
-    private void processAllCSVFiles() {
-        File directory = new File(LOCAL_SAVE_DIRECTORY);
-        File[] csvFiles = directory.listFiles((dir, name) -> name.endsWith(".csv"));
-
-        if (csvFiles != null && csvFiles.length > 0) {
-            for (File csvFile : csvFiles) {
-                dbExecutor.submit(() -> processCSVFile(csvFile));
-            }
-        }
-    }
-
-    private void convertLogToCSV(File logFile) {
-        String csvFileName = logFile.getAbsolutePath().replace(".log", ".csv");
-        File csvFile = new File(csvFileName);
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(logFile));
-             BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile))) {
-
-            String line;
-            int lineNumber = 0;
+    private void convertLogToCSV(Path logFilePath) {
+        String csvFileName = logFilePath.toString().replace(".log", ".csv");
+        try (BufferedReader reader = new BufferedReader(new FileReader(logFilePath.toFile()));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(csvFileName))) {
 
             // CSV 헤더 추가
             writer.write("Time,ID,Temper,WTemper,Humidity,Co2");
             writer.newLine();
 
-            while ((line = reader.readLine()) != null) {
-                lineNumber++;
-                String[] data = line.split("\\s+");  // 공백 기준으로 데이터 분할
-
-                // 최소한 6개의 데이터가 있어야 유효한 행으로 간주
-                if (data.length < 6) continue;
-
-                writer.write(String.join(",", data[0], data[1], data[2], data[3], data[4], data[5]));
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            System.out.println("CSV 변환 중 오류 발생: " + logFile.getName());
-            e.printStackTrace();
-        }
-    }
-
-
-    private void downloadFile(FTPClient ftpClient, FTPFile logFile) {
-        Path localPath = Paths.get(LOCAL_SAVE_DIRECTORY, logFile.getName());
-        try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(localPath.toFile()))) {
-            boolean success = ftpClient.retrieveFile(logFile.getName(), outputStream);
-            if (success) {
-                System.out.println("[다운로드 성공] 파일 다운로드 성공: " + logFile.getName());
-            } else {
-                System.out.println("[다운로드 실패] 파일 다운로드 실패: " + logFile.getName());
-            }
-        } catch (IOException e) {
-            System.out.println("[파일 저장 오류] 파일 다운로드 및 저장 중 오류 발생: " + logFile.getName());
-            e.printStackTrace();
-        }
-    }
-
-
-    private void processCSVFile(File csvFile) {
-        if (processedFiles.contains(csvFile.getName())) return;
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data.length < 7) continue;
-
-                String timestamp = data[0];
-                if (!processedTimestamps.add(timestamp)) continue;
-
-                int sensorId = getSensorIdFromDB();
-                int snFarmId = getSnFarmIdFromDB(sensorId);
-                int barnId = getBarnIdFromDB(sensorId, tableName);
-                int farmId = getFarmIdFromDB(snFarmId);
-                int userId = getUserIdFromDB(farmId);
-
-                saveSensorDataToDatabase(sensorId, snFarmId, barnId, farmId, userId, timestamp, data[1], data[2], data[3], data[4], data[5]);
+                String[] data = line.split("\\s+");
+                if (data.length < 6) continue;
+                writer.write(String.join(",", data));
+                writer.newLine();
             }
-            processedFiles.add(csvFile.getName());
+            System.out.println("[CSV 변환 성공] " + csvFileName);
         } catch (IOException e) {
-            System.out.println("CSV 파일 처리 중 오류 발생: " + csvFile.getName());
+            System.err.println("[CSV 변환 오류] 파일: " + logFilePath);
             e.printStackTrace();
         }
     }
 
-    private void saveSensorDataToDatabase(int sensorId, int snFarmId, int barnsId,int farmId, int userId, String time, String co2, String temper, String wtemper, String humidity, String sensorId3) {
-        String idColumn = SENSOR_TABLE_MAPPING.get(tableName);
-        if (idColumn == null) return;
-
-        String insertSQL = "INSERT INTO " + tableName + " (" + idColumn + ", SNFarmID, BarnsID, FarmID, UserID, Time, Co2, Temper, WTemper, Humidity, SensorId3) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
+    private int executeIdQuery(String sql, Object... params) {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(insertSQL)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, sensorId);
-            pstmt.setInt(2, snFarmId);
-            pstmt.setInt(3, barnsId);
-            pstmt.setInt(4, farmId);
-            pstmt.setInt(5, userId);
-            pstmt.setString(6, time);
-            pstmt.setString(7, co2);
-            pstmt.setString(8, temper);
-            pstmt.setString(9, wtemper);
-            pstmt.setString(10, humidity);
-            pstmt.setString(11, sensorId3);
-            pstmt.executeUpdate();
+            // 파라미터 설정
+            for (int i = 0; i < params.length; i++) {
+                pstmt.setObject(i + 1, params[i]);
+            }
+
+            // SQL 실행 및 결과 반환
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1); // 첫 번째 컬럼의 정수 값 반환
+                }
+            }
         } catch (SQLException e) {
-            System.out.println("DB 저장 중 오류 발생");
+            System.err.println("[DB 조회 오류] SQL: " + sql);
+            e.printStackTrace();
+        }
+        return 0; // 조회 실패 시 0 반환
+    }
+
+    private void processAllCSVFiles() {
+        try {
+            Files.walk(Paths.get(LOCAL_SAVE_DIRECTORY))
+                    .filter(Files::isRegularFile)
+                    .filter(path -> path.toString().endsWith(".csv"))
+                    .forEach(csvFile -> dbExecutor.submit(() -> processCSVFile(csvFile)));
+        } catch (IOException e) {
+            System.err.println("[처리 오류] CSV 파일 처리 중 오류 발생");
             e.printStackTrace();
         }
     }
 
     private int getSensorIdFromDB() {
-        return getMaxId("SensorID", tableName);
+        return getMaxId("SensorID", "Sensor");
     }
 
     private int getSnFarmIdFromDB(int sensorId) {
         return getRelatedId("SNFarmID", "Sensor", "SensorID", sensorId);
+    }
+
+    private int getBarnIdFromDB(int sensorId) {
+        return getRelatedId("BarnID", "Sensor", "SensorID", sensorId);
     }
 
     private int getFarmIdFromDB(int snFarmId) {
@@ -278,15 +218,76 @@ public class Catm1FTPLogFileProcessor {
         return executeIdQuery(sql, conditionValue);
     }
 
-    private int executeIdQuery(String sql, Object... params) {
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            if (params.length > 0) pstmt.setInt(1, (Integer) params[0]);
-            ResultSet rs = pstmt.executeQuery();
-            return rs.next() ? rs.getInt(1) : 0;
-        } catch (SQLException e) {
+    private void downloadDirectory(FTPClient ftpClient, String remotePath, String localPath) throws IOException {
+        FTPFile[] files = ftpClient.listFiles(remotePath);
+        for (FTPFile file : files) {
+            String remoteFilePath = remotePath + "/" + file.getName();
+            String localFilePath = localPath + "/" + file.getName();
+            if (file.isDirectory()) {
+                Files.createDirectories(Paths.get(localFilePath));
+                downloadDirectory(ftpClient, remoteFilePath, localFilePath);
+            } else if (file.getName().endsWith(".log")) {
+                downloadFile(ftpClient, remoteFilePath, localFilePath);
+            }
+        }
+    }
+
+    private void downloadFile(FTPClient ftpClient, String remoteFilePath, String localFilePath) {
+        try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(localFilePath))) {
+            boolean success = ftpClient.retrieveFile(remoteFilePath, outputStream);
+            if (success) {
+                System.out.println("[FTP] 파일 다운로드 성공: " + remoteFilePath);
+            } else {
+                System.err.println("[FTP] 파일 다운로드 실패: " + remoteFilePath);
+            }
+        } catch (IOException e) {
+            System.err.println("[FTP] 파일 저장 오류: " + remoteFilePath);
             e.printStackTrace();
-            return 0;
+        }
+    }
+
+    private void processCSVFile(Path csvFilePath) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(csvFilePath.toFile()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+                if (data.length < 6) continue;
+
+                int sensorId = getSensorIdFromDB();
+                int snFarmId = getSnFarmIdFromDB(sensorId);
+                int barnId = getBarnIdFromDB(sensorId);
+                int farmId = getFarmIdFromDB(snFarmId);
+                int userId = getUserIdFromDB(farmId);
+
+                saveSensorDataToDatabase(sensorId, snFarmId, barnId, farmId, userId, data[0], data[1], data[2], data[3], data[4], data[5]);
+            }
+            System.out.println("[CSV] 파일 처리 완료: " + csvFilePath);
+        } catch (IOException e) {
+            System.err.println("[CSV] 파일 처리 오류: " + csvFilePath);
+            e.printStackTrace();
+        }
+    }
+
+    private void saveSensorDataToDatabase(int sensorId, int snFarmId, int barnId, int farmId, int userId, String time, String co2, String temper, String wtemper, String humidity, String sensorId3) {
+        String insertSQL = "INSERT INTO GrowingSensor (SensorID, SNFarmID, BarnID, FarmID, UserID, Time, Co2, Temper, WTemper, Humidity, SensorId3) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+             PreparedStatement pstmt = conn.prepareStatement(insertSQL)) {
+            pstmt.setInt(1, sensorId);
+            pstmt.setInt(2, snFarmId);
+            pstmt.setInt(3, barnId);
+            pstmt.setInt(4, farmId);
+            pstmt.setInt(5, userId);
+            pstmt.setString(6, time);
+            pstmt.setString(7, co2);
+            pstmt.setString(8, temper);
+            pstmt.setString(9, wtemper);
+            pstmt.setString(10, humidity);
+            pstmt.setString(11, sensorId3);
+            pstmt.executeUpdate();
+            System.out.println("[DB] 데이터 저장 성공");
+        } catch (SQLException e) {
+            System.err.println("[DB] 데이터 저장 실패");
+            e.printStackTrace();
         }
     }
 }

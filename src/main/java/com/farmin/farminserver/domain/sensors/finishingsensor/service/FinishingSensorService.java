@@ -11,4 +11,7 @@ public interface FinishingSensorService {
     FinishingSensorResponse getFinishingSensorById(int id);
     FinishingSensorResponse updateFinishingSensor(int id, FinishingSensorRequest request);
     void deleteFinishingSensor(int id);
+
+    // 추가된 메서드
+    List<FinishingSensorResponse> getStatistics(String type, String year, String month, String weekOrDay);
 }

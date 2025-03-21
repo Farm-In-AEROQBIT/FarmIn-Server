@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.farmin.farminserver.entity.BaseEntity;
 
 @Data
 @Entity
@@ -13,26 +12,31 @@ import com.farmin.farminserver.entity.BaseEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "BoarsSensor")
-public class BoarsSensorEntity extends BaseEntity {
+public class BoarsSensorEntity {
 
-    @Column(nullable = false, length = 100)
-    private String BoarsID;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT 사용
+    @Column(name = "SensorID")
+    private Integer sensorID; // Integer로 정의
 
-    @Column(nullable = false, length = 50)
-    private String SensorID;
+    @Column(name = "BoarsID", nullable = false)
+    private String boarsID;
 
-    @Column(nullable = false, length = 50)
-    private String Co2;
+    @Column(name = "Co2")
+    private String co2;
 
-    @Column(nullable = false, length = 50)
-    private String Nh3;
+    @Column(name = "Nh3")
+    private String nh3;
 
-    @Column(nullable = false, length = 50)
-    private String PM;
+    @Column(name = "PM")
+    private String pm;
 
-    @Column(nullable = false, length = 50)
-    private String Temper;
+    @Column(name = "Temper")
+    private String temper;
 
-    @Column(nullable = false, length = 50)
-    private String Humidity;
+    @Column(name = "Humidity")
+    private String humidity;
+
+    @Column(name = "Time")
+    private String time;
 }

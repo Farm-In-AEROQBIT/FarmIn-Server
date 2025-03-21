@@ -11,4 +11,7 @@ public interface PigletSensorService {
     PigletSensorResponse getPigletSensorById(int id);
     PigletSensorResponse updatePigletSensor(int id, PigletSensorRequest request);
     void deletePigletSensor(int id);
+
+    // 추가된 메서드
+    List<PigletSensorResponse> getStatistics(String type, String year, String month, String weekOrDay);
 }

@@ -42,4 +42,16 @@ public class ReserveSensorController {
         reserveSensorService.deleteReserveSensor(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<List<ReserveSensorResponse>> getStatistics(
+            @RequestParam(defaultValue = "yearly") String type, // 기본값 설정
+            @RequestParam(required = false) String year,
+            @RequestParam(required = false) String month,
+            @RequestParam(required = false) String weekOrDay
+    ) {
+        List<ReserveSensorResponse> responses = reserveSensorService.getStatistics(type, year, month, weekOrDay);
+        return ResponseEntity.ok(responses);
+    }
+
 }

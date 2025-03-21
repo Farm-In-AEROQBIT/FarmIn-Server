@@ -19,7 +19,7 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity // ✅ @PreAuthorize 활성화 (Spring Boot 3.3 이상)
+@EnableMethodSecurity // @PreAuthorize 활성화
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtRequestFilter jwtRequestFilter;
@@ -29,13 +29,13 @@ public class SecurityConfig {
         httpSecurity
                 .csrf(csrf -> csrf.disable())  // CSRF 보호 비활성화 (JWT 사용 시 필요 없음)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // ✅ JWT 사용을 위한 세션 관리 비활성화
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // JWT 사용을 위한 세션 관리 비활성화
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/favicon.ico", "/robots.txt", "/index.html", "/open-api/**").permitAll() // ✅ 인증 필요 없는 경로
-                        .requestMatchers("/admin/**").hasRole("ADMIN") // ✅ 관리자 전용 API 보호
-                        .anyRequest().authenticated() // ✅ 나머지 경로는 인증 필요
+                        .requestMatchers("/", "/favicon.ico", "/robots.txt", "/index.html", "/open-api/**").permitAll() // 인증 필요 없는 경로
+                        .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자 전용 API 보호
+                        .anyRequest().authenticated() // 나머지 경로는 인증 필요
                 )
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // ✅ JWT 필터 추가
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // JWT 필터 추가
 
         return httpSecurity.build();
     }

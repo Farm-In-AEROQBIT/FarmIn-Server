@@ -1,6 +1,5 @@
 package com.farmin.farminserver.domain.sensors.boarssensor.controller;
 
-import com.farmin.farminserver.common.api.Api;
 import com.farmin.farminserver.domain.sensors.boarssensor.dto.BoarsSensorRequest;
 import com.farmin.farminserver.domain.sensors.boarssensor.dto.BoarsSensorResponse;
 import com.farmin.farminserver.domain.sensors.boarssensor.service.BoarsSensorService;
@@ -11,32 +10,48 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/boarssensors")
 @RequiredArgsConstructor
-@RequestMapping("/api/boars-sensor")
 public class BoarsSensorController {
+
     private final BoarsSensorService boarsSensorService;
 
     @PostMapping
-    public ResponseEntity<Api<BoarsSensorResponse>> createBoarsSensor(@RequestBody BoarsSensorRequest request) {
+    public ResponseEntity<BoarsSensorResponse> createBoarsSensor(@RequestBody BoarsSensorRequest request) {
         BoarsSensorResponse response = boarsSensorService.createBoarsSensor(request);
-        return ResponseEntity.ok(Api.OK(response));
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Api<BoarsSensorResponse>> getBoarsSensorById(@PathVariable Integer id) {
-        BoarsSensorResponse response = boarsSensorService.getBoarsSensorById(id);
-        return ResponseEntity.ok(Api.OK(response));
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping
-    public ResponseEntity<Api<List<BoarsSensorResponse>>> getAllBoarsSensors() {
-        List<BoarsSensorResponse> responses = boarsSensorService.getAllBoarsSensors();
-        return ResponseEntity.ok(Api.OK(responses));
+    public ResponseEntity<List<BoarsSensorResponse>> getAllBoarsSensors() {
+        return ResponseEntity.ok(boarsSensorService.getAllBoarsSensors());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<BoarsSensorResponse> getBoarsSensorById(@PathVariable int id) {
+        return ResponseEntity.ok(boarsSensorService.getBoarsSensorById(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<BoarsSensorResponse> updateBoarsSensor(@PathVariable int id, @RequestBody BoarsSensorRequest request) {
+        return ResponseEntity.ok(boarsSensorService.updateBoarsSensor(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Api<Void>> deleteBoarsSensor(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteBoarsSensor(@PathVariable int id) {
         boarsSensorService.deleteBoarsSensor(id);
-        return ResponseEntity.ok(Api.OK(null));
+        return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<List<BoarsSensorResponse>> getStatistics(
+            @RequestParam(defaultValue = "yearly") String type, // 기본값 설정
+            @RequestParam(required = false) String year,
+            @RequestParam(required = false) String month,
+            @RequestParam(required = false) String weekOrDay
+    ) {
+        List<BoarsSensorResponse> responses = boarsSensorService.getStatistics(type, year, month, weekOrDay);
+        return ResponseEntity.ok(responses);
+    }
+
 }

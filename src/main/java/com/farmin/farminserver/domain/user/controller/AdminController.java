@@ -26,7 +26,7 @@ public class AdminController {
     // 관리자만 사용자 삭제 가능
     @DeleteMapping("/users/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteUser(@PathVariable Integer id) { // ✅ Long → Integer로 변경
+    public ResponseEntity<?> deleteUser(@PathVariable Integer id) { //Long → Integer로 변경
         userService.deleteUser(id);
         return ResponseEntity.ok().build();
     }

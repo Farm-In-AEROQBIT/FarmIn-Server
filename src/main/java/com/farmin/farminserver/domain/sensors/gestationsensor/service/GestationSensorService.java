@@ -11,4 +11,7 @@ public interface GestationSensorService {
     GestationSensorResponse getGestationSensorById(int id);
     GestationSensorResponse updateGestationSensor(int id, GestationSensorRequest request);
     void deleteGestationSensor(int id);
+
+    // 추가된 메서드
+    List<GestationSensorResponse> getStatistics(String type, String year, String month, String weekOrDay);
 }
