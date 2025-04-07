@@ -14,14 +14,9 @@ public class CustomUserDetail implements UserDetails {
 
     private final UserEntity user;
 
-    public CustomUserDetail(UserEntity user) {
-        this.user = user;
-    }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // 여기서는 기본적인 권한 리스트를 반환하고, 필요시 실제 권한 정보로 대체 가능
-        return List.of(new SimpleGrantedAuthority(user.getRole().name())); //Admin 권한 반영1
+        return List.of(new SimpleGrantedAuthority(user.getRole().name())); // Admin 권한 반영
     }
 
     @Override

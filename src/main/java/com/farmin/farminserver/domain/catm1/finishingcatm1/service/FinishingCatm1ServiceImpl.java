@@ -44,16 +44,13 @@ public class FinishingCatm1ServiceImpl implements FinishingCatm1Service {
         FinishingCatm1Entity entity = finishingcatm1Repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Sensor not found"));
 
-        // 필드 업데이트
-        entity.setCo2(request.getCo2());
-        entity.setWtemper(request.getWTemper());
         entity.setTemper(request.getTemper());
         entity.setHumidity(request.getHumidity());
+        entity.setWtemper(request.getWTemper());
+        entity.setCo2(request.getCo2());
 
-        finishingcatm1Repository.save(entity);
-        return finishingcatm1mapper.toResponse(entity);
+        return finishingcatm1mapper.toResponse(finishingcatm1Repository.save(entity));
     }
-
     @Override
     public void deleteFinishingCatm1(int id) {
         finishingcatm1Repository.deleteById(id);

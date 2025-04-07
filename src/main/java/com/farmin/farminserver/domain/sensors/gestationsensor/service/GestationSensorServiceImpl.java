@@ -5,8 +5,6 @@ import com.farmin.farminserver.domain.sensors.gestationsensor.dto.GestationSenso
 import com.farmin.farminserver.domain.sensors.gestationsensor.mapper.GestationSensorMapper;
 import com.farmin.farminserver.entity.sensors.gestationsensor.GestationSensorEntity;
 import com.farmin.farminserver.entity.sensors.gestationsensor.GestationSensorRepository;
-import com.farmin.farminserver.entity.sensors.growingsensor.GrowingSensorEntity;
-import com.farmin.farminserver.entity.sensors.growingsensor.GrowingSensorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +33,7 @@ public class GestationSensorServiceImpl implements GestationSensorService {
     }
 
     @Override
-    public GestationSensorResponse getgestationSensorById(int id) {
+    public GestationSensorResponse getGestationSensorById(int id) {
         GestationSensorEntity entity = gestationSensorRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Sensor not found"));
         return mapper.toResponse(entity);

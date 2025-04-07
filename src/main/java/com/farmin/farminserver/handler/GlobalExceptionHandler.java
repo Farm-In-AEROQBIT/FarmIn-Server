@@ -32,10 +32,4 @@ public class GlobalExceptionHandler {
                 .body(Api.ERROR(ex.getErrorCodeIfs(), ex.getErrorDescription()));
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Api<Object>> handleGlobalException(Exception ex) {
-        log.error("서버 내부 오류 발생", ex);
-        return ResponseEntity.status(500)
-                .body(Api.ERROR(ErrorCode.SERVER_ERROR));
-    }
 }

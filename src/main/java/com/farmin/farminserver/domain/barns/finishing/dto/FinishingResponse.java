@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class FinishingResponse {
     private Integer finishingID;
-    private String farmID;
+    private String snfarmID;
 }

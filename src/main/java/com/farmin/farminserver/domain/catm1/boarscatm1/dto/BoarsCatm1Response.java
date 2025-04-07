@@ -6,8 +6,8 @@ import lombok.Data;
 @Data
 @Builder
 public class BoarsCatm1Response {
-    private String boarsID;
-    private String sensorid3;
+    private Integer sensoridc;
+    private Integer boarsID;
     private String temper;
     private String wtemper;
     private String humidity;

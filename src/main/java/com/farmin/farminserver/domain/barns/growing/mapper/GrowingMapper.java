@@ -3,18 +3,21 @@ package com.farmin.farminserver.domain.barns.growing.mapper;
 import com.farmin.farminserver.domain.barns.growing.dto.GrowingRequest;
 import com.farmin.farminserver.domain.barns.growing.dto.GrowingResponse;
 import com.farmin.farminserver.entity.barns.growing.GrowingEntity;
+import org.springframework.stereotype.Component;
 
+@Component
 public class GrowingMapper {
-    public static GrowingEntity toEntity(GrowingRequest dto) {
+
+    public GrowingEntity toEntity(GrowingRequest dto) {
         return GrowingEntity.builder()
-                .FarmID(dto.getFarmID())
+                .snFarmId(dto.getSnFarmId())
                 .build();
     }
 
-    public static GrowingResponse toResponseDTO(GrowingEntity entity) {
-        GrowingResponse responseDTO = new GrowingResponse();
-        responseDTO.setGrowingID(entity.getId());
-        responseDTO.setFarmID(entity.getFarmID());
-        return responseDTO;
+    public GrowingResponse toResponseDTO(GrowingEntity entity) {
+        GrowingResponse dto = new GrowingResponse();
+        dto.setGrowingId(entity.getGrowingId());
+        dto.setSnFarmId(entity.getSnFarmId());
+        return dto;
     }
 }

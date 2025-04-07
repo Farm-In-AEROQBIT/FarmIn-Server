@@ -8,25 +8,26 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MaternityCatm1Mapper {
-    public static MaternityCatm1Entity toEntity(MaternityCatm1Request dto) {
+
+    public MaternityCatm1Entity toEntity(MaternityCatm1Request dto) {
         return MaternityCatm1Entity.builder()
                 .maternityID(dto.getMaternityID())
-                .co2(dto.getCo2())
-                .time(dto.getTime())
-                .humidity(dto.getHumidity())
                 .temper(dto.getTemper())
                 .wtemper(dto.getWTemper())
+                .humidity(dto.getHumidity())
+                .co2(dto.getCo2())
+                .time(dto.getTime())
                 .build();
     }
 
-    public MaternityCatm1Response toResponse(MaternityCatm1Entity entity){
+    public MaternityCatm1Response toResponse(MaternityCatm1Entity entity) {
         return MaternityCatm1Response.builder()
-                .sensorid3(entity.getSensorID() != null ? entity.getSensorID().toString() : null) //integer -> String
+                .sensorIdc(entity.getSensorIdc())
                 .maternityID(entity.getMaternityID())
-                .co2(entity.getCo2())
                 .temper(entity.getTemper())
-                .wtemper(entity.getWtemper())
+                .wTemper(entity.getWtemper())
                 .humidity(entity.getHumidity())
+                .co2(entity.getCo2())
                 .time(entity.getTime())
                 .build();
     }

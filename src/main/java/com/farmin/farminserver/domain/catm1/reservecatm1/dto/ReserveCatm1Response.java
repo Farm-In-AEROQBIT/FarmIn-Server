@@ -6,10 +6,10 @@ import lombok.Data;
 @Data
 @Builder
 public class ReserveCatm1Response {
-    private String reserveID;
-    private String sensorid3;
+    private Integer sensorIdc;
+    private Integer reserveID;
     private String temper;
-    private String wtemper;
+    private String wTemper;
     private String humidity;
     private String co2;
     private String time;

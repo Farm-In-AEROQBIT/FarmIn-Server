@@ -8,21 +8,33 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/growing")
 public class GrowingController {
+
     private final GrowingService growingService;
 
     @PostMapping
-    public ResponseEntity<Api<GrowingResponse>> createGrowing(@RequestBody GrowingRequest dto) {
-        GrowingResponse response = growingService.createGrowing(dto);
-        return ResponseEntity.ok(Api.OK(response));
+    public ResponseEntity<Api<GrowingResponse>> create(@RequestBody GrowingRequest dto) {
+        return ResponseEntity.ok(Api.OK(growingService.createGrowing(dto)));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Api<GrowingResponse>> getGrowingById(@PathVariable Integer id) {
-        GrowingResponse response = growingService.getGrowingById(id);
-        return ResponseEntity.ok(Api.OK(response));
+    public ResponseEntity<Api<GrowingResponse>> getById(@PathVariable Integer id) {
+        return ResponseEntity.ok(Api.OK(growingService.getGrowingById(id)));
+    }
+
+    @GetMapping
+    public ResponseEntity<Api<List<GrowingResponse>>> getAll() {
+        return ResponseEntity.ok(Api.OK(growingService.getAllGrowing()));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Api<String>> delete(@PathVariable Integer id) {
+        growingService.deleteGrowingById(id);
+        return ResponseEntity.ok(Api.OK("Deleted Growing with ID: " + id));
     }
 }

@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class MaternityRequest {
-    private String farmID;
+    private String snFarmId;
 }

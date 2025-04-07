@@ -16,10 +16,15 @@ public class FinishingCatm1Controller {
 
     private final FinishingCatm1Service finishingCatm1Service;
 
+//    @PostMapping
+//    public ResponseEntity<FinishingCatm1Response> createFinishingCatm1(@RequestBody FinishingCatm1Request request) {
+//        FinishingCatm1Response response = finishingCatm1Service.createFinishingCatm1(request);
+//        return ResponseEntity.ok(response);
+//    }
+
     @PostMapping
-    public ResponseEntity<FinishingCatm1Response> createFinishingCatm1(@RequestBody FinishingCatm1Request request) {
-        FinishingCatm1Response response = finishingCatm1Service.createFinishingCatm1(request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<FinishingCatm1Response> create(@RequestBody FinishingCatm1Request request) {
+        return ResponseEntity.ok(finishingCatm1Service.createFinishingCatm1(request));
     }
 
     @GetMapping
@@ -33,12 +38,12 @@ public class FinishingCatm1Controller {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<FinishingCatm1Response> updateFinishingCatm1ById(@PathVariable Integer id, @RequestBody FinishingCatm1Request request) {
+    public ResponseEntity<FinishingCatm1Response> update(@PathVariable Integer id, @RequestBody FinishingCatm1Request request) {
         return ResponseEntity.ok(finishingCatm1Service.updateFinishingCatm1(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteFinishingCatm1ById(@PathVariable Integer id) {
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
         finishingCatm1Service.deleteFinishingCatm1(id);
         return ResponseEntity.noContent().build();
     }

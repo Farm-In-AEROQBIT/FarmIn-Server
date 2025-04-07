@@ -4,11 +4,10 @@ import lombok.Data;
 
 @Data
 public class PigletCatm1Request {
-    private String PigletID; // Farms ID
-    private String SenSorId3; // Sensor ID
-    private String Temper; // Temper
-    private String WTemper; // Water Temper
-    private String Humidity; // Humidity
-    private String Co2; //Co2
-    private String Time;
+    private Integer pigletID;
+    private String temper;
+    private String wTemper;
+    private String humidity;
+    private String co2;
+    private String time;
 }

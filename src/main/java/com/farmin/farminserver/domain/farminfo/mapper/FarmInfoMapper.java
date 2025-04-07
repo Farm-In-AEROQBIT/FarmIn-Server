@@ -15,7 +15,7 @@ public class FarmInfoMapper {
 
     public static FarmInfoResponse toResponse(FarmInfoEntity entity) {
         return FarmInfoResponse.builder()
-                .farmId(String.valueOf(entity.getId()))
+                .farmId(String.valueOf(entity.getFarmID()))
                 .farmName(entity.getFarmName())
                 .userId(entity.getUserID())
                 .build();

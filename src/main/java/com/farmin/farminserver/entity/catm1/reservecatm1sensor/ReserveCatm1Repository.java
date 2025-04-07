@@ -6,20 +6,17 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface ReserveCatm1Repository extends JpaRepository<ReserveCatm1Entity, Integer>{
-    // 연간 통계: 연도만 일치
-    @Query("SELECT g FROM ReserveCatm1Entity g WHERE g.time LIKE CONCAT(:year, '%')")
+public interface ReserveCatm1Repository extends JpaRepository<ReserveCatm1Entity, Integer> {
+
+    @Query("SELECT r FROM ReserveCatm1Entity r WHERE r.time LIKE CONCAT(:year, '%')")
     List<ReserveCatm1Entity> findByYear(@Param("year") String year);
 
-    // 월간 통계: 연도와 월 일치
-    @Query("SELECT g FROM ReserveCatm1Entity g WHERE g.time LIKE CONCAT(:year, '-', :month, '%')")
+    @Query("SELECT r FROM ReserveCatm1Entity r WHERE r.time LIKE CONCAT(:year, '-', :month, '%')")
     List<ReserveCatm1Entity> findByYearAndMonth(@Param("year") String year, @Param("month") String month);
 
-    // 주간 통계: 특정 날짜 범위 (startDate ~ endDate)
-    @Query("SELECT g FROM ReserveCatm1Entity g WHERE g.time BETWEEN :startDate AND :endDate")
+    @Query("SELECT r FROM ReserveCatm1Entity r WHERE r.time BETWEEN :startDate AND :endDate")
     List<ReserveCatm1Entity> findByDateRange(@Param("startDate") String startDate, @Param("endDate") String endDate);
 
-    // 일간 통계: 특정 연도-월-일 일치
-    @Query("SELECT g FROM ReserveCatm1Entity g WHERE g.time LIKE CONCAT(:year, '-', :month, '-', :day, '%')")
+    @Query("SELECT r FROM ReserveCatm1Entity r WHERE r.time LIKE CONCAT(:year, '-', :month, '-', :day, '%')")
     List<ReserveCatm1Entity> findByYearMonthAndDay(@Param("year") String year, @Param("month") String month, @Param("day") String day);
 }

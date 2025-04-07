@@ -5,8 +5,6 @@ import com.farmin.farminserver.domain.catm1.boarscatm1.dto.BoarsCatm1Response;
 import com.farmin.farminserver.domain.catm1.boarscatm1.mapper.BoarsCatm1Mapper;
 import com.farmin.farminserver.entity.catm1.boarscatm1sensor.BoarsCatm1Entity;
 import com.farmin.farminserver.entity.catm1.boarscatm1sensor.BoarsCatm1Repository;
-import com.farmin.farminserver.entity.catm1.growingcatm1sensor.GrowingCatm1Entity;
-import com.farmin.farminserver.entity.catm1.growingcatm1sensor.GrowingCatm1Repository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,48 +15,48 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BoarsCatm1ServiceImpl implements BoarsCatm1Service {
 
-    private final BoarsCatm1Repository boarscatm1Repository;
-    private final BoarsCatm1Mapper boarscatm1mapper;
+    private final BoarsCatm1Repository boarsCatm1Repository;
+    private final BoarsCatm1Mapper boarsCatm1Mapper;
 
     @Override
     public BoarsCatm1Response createBoarsCatm1(BoarsCatm1Request request) {
-        BoarsCatm1Entity entity = boarscatm1mapper.toEntity(request);
-        boarscatm1Repository.save(entity);
-        return boarscatm1mapper.toResponse(entity);
+        BoarsCatm1Entity entity = boarsCatm1Mapper.toEntity(request);
+        boarsCatm1Repository.save(entity);
+        return boarsCatm1Mapper.toResponse(entity);
     }
 
     @Override
     public List<BoarsCatm1Response> getAllBoarsCatm1() {
-        return boarscatm1Repository.findAll().stream()
-                .map(boarscatm1mapper::toResponse)
+        return boarsCatm1Repository.findAll().stream()
+                .map(boarsCatm1Mapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public BoarsCatm1Response getBoarsCatm1ById(int id) {
-        BoarsCatm1Entity entity = boarscatm1Repository.findById(id)
+    public BoarsCatm1Response getBoarsCatm1ById(int sensorIdc) {
+        BoarsCatm1Entity entity = boarsCatm1Repository.findById(sensorIdc)
                 .orElseThrow(() -> new IllegalArgumentException("Sensor not found"));
-        return boarscatm1mapper.toResponse(entity);
+        return boarsCatm1Mapper.toResponse(entity);
     }
 
     @Override
     public BoarsCatm1Response updateBoarsCatm1(int id, BoarsCatm1Request request) {
-        BoarsCatm1Entity entity = boarscatm1Repository.findById(id)
+        BoarsCatm1Entity entity = boarsCatm1Repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Sensor not found"));
 
         // 필드 업데이트
         entity.setCo2(request.getCo2());
-        entity.setWtemper(request.getWTemper());
+        entity.setWtemper(request.getWtemper());
         entity.setTemper(request.getTemper());
         entity.setHumidity(request.getHumidity());
 
-        boarscatm1Repository.save(entity);
-        return boarscatm1mapper.toResponse(entity);
+        boarsCatm1Repository.save(entity);
+        return boarsCatm1Mapper.toResponse(entity);
     }
 
     @Override
-    public void deleteBoarsCatm1(int id) {
-        boarscatm1Repository.deleteById(id);
+    public void deleteBoarsCatm1(int sensorIdc) {
+        boarsCatm1Repository.deleteById(sensorIdc);
     }
 
     @Override
@@ -71,24 +69,24 @@ public class BoarsCatm1ServiceImpl implements BoarsCatm1Service {
 
         switch (type.toLowerCase()) {
             case "yearly":
-                catm1 = boarscatm1Repository.findByYear(year);
+                catm1 = boarsCatm1Repository.findByYear(year);
                 break;
             case "monthly":
-                catm1 = boarscatm1Repository.findByYearAndMonth(year, month);
+                catm1 = boarsCatm1Repository.findByYearAndMonth(year, month);
                 break;
             case "weekly":
                 String[] dateRange = calculateDateRange(year, month, weekOrDay);
-                catm1 = boarscatm1Repository.findByDateRange(dateRange[0], dateRange[1]);
+                catm1 = boarsCatm1Repository.findByDateRange(dateRange[0], dateRange[1]);
                 break;
             case "daily":
-                catm1 = boarscatm1Repository.findByYearMonthAndDay(year, month, weekOrDay);
+                catm1 = boarsCatm1Repository.findByYearMonthAndDay(year, month, weekOrDay);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid type: " + type);
         }
 
         return catm1.stream()
-                .map(boarscatm1mapper::toResponse)
+                .map(boarsCatm1Mapper::toResponse)
                 .collect(Collectors.toList());
     }
 

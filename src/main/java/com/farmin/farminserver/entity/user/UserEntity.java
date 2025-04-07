@@ -1,12 +1,10 @@
 package com.farmin.farminserver.entity.user;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import com.farmin.farminserver.entity.BaseEntity;
+import lombok.*;
 import com.farmin.farminserver.entity.user.enums.Role;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -16,27 +14,32 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "User")
-public class UserEntity extends BaseEntity {
-    @Column(unique = true, nullable = false, length = 50)
+public class UserEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
     private String username;
 
-    @Column(nullable = false, length = 50)
-    private String name;
-
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false, length = 10)
-    @Enumerated(value = EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    @Column(nullable = false, updatable = false)
+    @CreationTimestamp
+    private LocalDateTime created_at;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
+    @Column(nullable = false)
+    @UpdateTimestamp
+    private LocalDateTime updated_at;
 }

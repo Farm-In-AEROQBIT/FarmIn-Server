@@ -9,25 +9,25 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class FinishingCatm1Mapper {
-    public static FinishingCatm1Entity toEntity(FinishingCatm1Request dto) {
+    public FinishingCatm1Entity toEntity(FinishingCatm1Request dto) {
         return FinishingCatm1Entity.builder()
                 .finishingID(dto.getFinishingID())
-                .co2(dto.getCo2())
-                .time(dto.getTime())
-                .humidity(dto.getHumidity())
                 .temper(dto.getTemper())
                 .wtemper(dto.getWTemper())
+                .humidity(dto.getHumidity())
+                .co2(dto.getCo2())
+                .time(dto.getTime())
                 .build();
     }
 
-    public FinishingCatm1Response toResponse(FinishingCatm1Entity entity){
+    public FinishingCatm1Response toResponse(FinishingCatm1Entity entity) {
         return FinishingCatm1Response.builder()
-                .sensorid3(entity.getSensorID() != null ? entity.getSensorID().toString() : null) //integer -> String
+                .sensorIdc(entity.getSensorIdc())
                 .finishingID(entity.getFinishingID())
-                .co2(entity.getCo2())
                 .temper(entity.getTemper())
-                .wtemper(entity.getWtemper())
+                .wTemper(entity.getWtemper())
                 .humidity(entity.getHumidity())
+                .co2(entity.getCo2())
                 .time(entity.getTime())
                 .build();
     }

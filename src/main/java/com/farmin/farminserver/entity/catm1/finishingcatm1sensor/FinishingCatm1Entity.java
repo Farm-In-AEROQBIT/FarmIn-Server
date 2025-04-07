@@ -6,21 +6,21 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @Entity
-@Builder
+@Table(name = "FinishingCatm1Sensor")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "FinishingCatm1Sensor")
+@Builder
 public class FinishingCatm1Entity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT 사용
-    @Column(name = "SensorID")
-    private Integer sensorID; // Integer로 정의
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "SensorIdc")
+    private Integer sensorIdc;
 
     @Column(name = "FinishingID", nullable = false)
-    private String finishingID;
+    private Integer finishingID;
 
     @Column(name = "Temper")
     private String temper;
@@ -37,3 +37,4 @@ public class FinishingCatm1Entity {
     @Column(name = "Time")
     private String time;
 }
+

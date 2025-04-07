@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class MaternityResponse {
-    private Integer maternityID;
-    private String farmID;
+    private Integer maternityId;
+    private String snFarmId;
 }

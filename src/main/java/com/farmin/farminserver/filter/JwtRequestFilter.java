@@ -39,7 +39,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 path.contains("/ftp-service") || // FTP 서비스
                 path.startsWith("/actuator/") || // Spring Actuator
                 path.equals("/favicon.ico") || // Favicon 요청
-                path.startsWith("/robots.txt"); // robots.txt 요청
+                path.startsWith("/robots.txt") || // robots.txt 요청
+                path.equals("/containers/json");
     }
 
 

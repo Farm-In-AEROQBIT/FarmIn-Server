@@ -1,22 +1,21 @@
 package com.farmin.farminserver.entity.barns.piglet;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import com.farmin.farminserver.entity.BaseEntity;
+import lombok.*;
 
-@Data
+@Getter
 @Entity
-@Builder
+@Table(name = "Piglet")
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Piglet")
-public class PigletEntity extends BaseEntity{
-    @Column(nullable = false, length = 50)
-    private String FarmID;
+@Builder
+public class PigletEntity {
 
-    @Column(nullable = false, length = 100)
-    private String PigletID;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "PigletID")
+    private Integer pigletId;
+
+    @Column(name = "SNFarmID", nullable = false, length = 100)
+    private String snFarmId;
 }

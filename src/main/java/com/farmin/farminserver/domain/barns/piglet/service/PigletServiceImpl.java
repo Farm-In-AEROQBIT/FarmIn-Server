@@ -12,18 +12,19 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PigletServiceImpl implements PigletService {
     private final PigletRepository pigletRepository;
+    private final PigletMapper pigletMapper;
 
     @Override
     public PigletResponse createPiglet(PigletRequest dto) {
-        PigletEntity entity = PigletMapper.toEntity(dto);
-        PigletEntity savedEntity = pigletRepository.save(entity);
-        return PigletMapper.toResponseDTO(savedEntity);
+        PigletEntity entity = pigletMapper.toEntity(dto);
+        PigletEntity saved = pigletRepository.save(entity);
+        return pigletMapper.toResponseDTO(saved);
     }
 
     @Override
     public PigletResponse getPigletById(Integer id) {
         PigletEntity entity = pigletRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Piglet entity not found"));
-        return PigletMapper.toResponseDTO(entity);
+        return pigletMapper.toResponseDTO(entity);
     }
 }

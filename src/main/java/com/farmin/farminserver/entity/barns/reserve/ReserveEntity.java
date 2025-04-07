@@ -1,22 +1,21 @@
 package com.farmin.farminserver.entity.barns.reserve;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import com.farmin.farminserver.entity.BaseEntity;
+import lombok.*;
 
-@Data
+@Getter
 @Entity
-@Builder
+@Table(name = "Reserve")
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Reserve")
-public class ReserveEntity extends BaseEntity {
-    @Column(nullable = false, length = 50)
-    private String FarmID;
+@Builder
+public class ReserveEntity {
 
-    @Column(nullable = false, length = 100)
-    private String ReserveID;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ReserveID")
+    private Integer reserveId;
+
+    @Column(name = "SNFarmID", nullable = false, length = 100)
+    private String snFarmId;
 }

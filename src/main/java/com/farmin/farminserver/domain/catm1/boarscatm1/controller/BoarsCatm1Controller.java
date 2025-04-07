@@ -17,9 +17,8 @@ public class BoarsCatm1Controller {
     private final BoarsCatm1Service boarsCatm1Service;
 
     @PostMapping
-    public ResponseEntity<BoarsCatm1Response> createBoarsCatm1(@RequestBody BoarsCatm1Request request) {
-        BoarsCatm1Response response = boarsCatm1Service.createBoarsCatm1(request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<BoarsCatm1Response> create(@RequestBody BoarsCatm1Request request) {
+        return ResponseEntity.ok(boarsCatm1Service.createBoarsCatm1(request));
     }
 
     @GetMapping
@@ -38,7 +37,7 @@ public class BoarsCatm1Controller {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBoarsCatm1ById(@PathVariable Integer id) {
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
         boarsCatm1Service.deleteBoarsCatm1(id);
         return ResponseEntity.noContent().build();
     }

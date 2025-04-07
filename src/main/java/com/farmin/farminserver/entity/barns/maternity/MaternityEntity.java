@@ -1,23 +1,21 @@
 package com.farmin.farminserver.entity.barns.maternity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import com.farmin.farminserver.entity.BaseEntity;
+import lombok.*;
 
-@Data
+@Getter
 @Entity
-@Builder
+@Table(name = "Maternity")
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Maternity")
-public class MaternityEntity extends BaseEntity{
-    @Column(nullable = false, length = 50)
-    private String FarmID;
+@Builder
+public class MaternityEntity {
 
-    @Column(nullable = false, length = 100)
-    private String MaternityID;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "MaternityID")
+    private Integer maternityId;
+
+    @Column(name = "SNFarmID", nullable = false, length = 100)
+    private String snFarmId;
 }
-

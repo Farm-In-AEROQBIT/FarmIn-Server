@@ -3,18 +3,21 @@ package com.farmin.farminserver.domain.barns.maternity.mapper;
 import com.farmin.farminserver.domain.barns.maternity.dto.MaternityRequest;
 import com.farmin.farminserver.domain.barns.maternity.dto.MaternityResponse;
 import com.farmin.farminserver.entity.barns.maternity.MaternityEntity;
+import org.springframework.stereotype.Component;
 
+@Component
 public class MaternityMapper {
-    public static MaternityEntity toEntity(MaternityRequest dto) {
+
+    public MaternityEntity toEntity(MaternityRequest dto) {
         return MaternityEntity.builder()
-                .FarmID(dto.getFarmID())
+                .snFarmId(dto.getSnFarmId())
                 .build();
     }
 
-    public static MaternityResponse toResponseDTO(MaternityEntity entity) {
-        MaternityResponse responseDTO = new MaternityResponse();
-        responseDTO.setMaternityID(entity.getId());
-        responseDTO.setFarmID(entity.getFarmID());
-        return responseDTO;
+    public MaternityResponse toResponseDTO(MaternityEntity entity) {
+        MaternityResponse response = new MaternityResponse();
+        response.setMaternityId(entity.getMaternityId());
+        response.setSnFarmId(entity.getSnFarmId());
+        return response;
     }
 }

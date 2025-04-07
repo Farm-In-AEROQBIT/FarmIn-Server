@@ -9,25 +9,26 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ReserveCatm1Mapper {
-    public static ReserveCatm1Entity toEntity(ReserveCatm1Request dto) {
+
+    public ReserveCatm1Entity toEntity(ReserveCatm1Request dto) {
         return ReserveCatm1Entity.builder()
                 .reserveID(dto.getReserveID())
-                .co2(dto.getCo2())
-                .time(dto.getTime())
-                .humidity(dto.getHumidity())
                 .temper(dto.getTemper())
                 .wtemper(dto.getWTemper())
+                .humidity(dto.getHumidity())
+                .co2(dto.getCo2())
+                .time(dto.getTime())
                 .build();
     }
 
-    public ReserveCatm1Response toResponse(ReserveCatm1Entity entity){
+    public ReserveCatm1Response toResponse(ReserveCatm1Entity entity) {
         return ReserveCatm1Response.builder()
-                .sensorid3(entity.getSensorID() != null ? entity.getSensorID().toString() : null) //integer -> String
+                .sensorIdc(entity.getSensorIdc())
                 .reserveID(entity.getReserveID())
-                .co2(entity.getCo2())
                 .temper(entity.getTemper())
-                .wtemper(entity.getWtemper())
+                .wTemper(entity.getWtemper())
                 .humidity(entity.getHumidity())
+                .co2(entity.getCo2())
                 .time(entity.getTime())
                 .build();
     }

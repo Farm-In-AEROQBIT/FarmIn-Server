@@ -1,22 +1,23 @@
 package com.farmin.farminserver.entity.barns.finishing;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import com.farmin.farminserver.entity.BaseEntity;
+import jakarta.persistence.*;
+import lombok.*;
 
-@Data
 @Entity
+@Table(name = "Finishing")
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Finishing")
-public class FinishingEntity extends BaseEntity{
-    @Column(nullable = false, length = 50)
-    private String FarmID;
+public class FinishingEntity extends BaseEntity {
 
-    @Column(nullable = false, length = 100)
-    private String FinishingID;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "FinishingID")
+    private Integer finishingId;
+
+    @Column(name = "SNFarmID", nullable = false, length = 100)
+    private String snFarmId;
 }

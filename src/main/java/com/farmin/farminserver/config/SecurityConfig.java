@@ -22,6 +22,7 @@ import java.util.Arrays;
 @EnableMethodSecurity // @PreAuthorize 활성화
 @RequiredArgsConstructor
 public class SecurityConfig {
+
     private final JwtRequestFilter jwtRequestFilter;
 
     @Bean
@@ -33,6 +34,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/favicon.ico", "/robots.txt", "/index.html", "/open-api/**").permitAll() // 인증 필요 없는 경로
                         .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자 전용 API 보호
+                        .requestMatchers("/api/**").hasAnyRole("ADMIN", "USER") // 인증된 사용자만 접근 가능
                         .anyRequest().authenticated() // 나머지 경로는 인증 필요
                 )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // JWT 필터 추가
@@ -49,7 +51,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

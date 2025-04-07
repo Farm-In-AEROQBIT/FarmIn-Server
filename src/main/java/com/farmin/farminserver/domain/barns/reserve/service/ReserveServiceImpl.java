@@ -12,18 +12,19 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ReserveServiceImpl implements ReserveService {
     private final ReserveRepository reserveRepository;
+    private final ReserveMapper reserveMapper;
 
     @Override
     public ReserveResponse createReserve(ReserveRequest dto) {
-        ReserveEntity entity = ReserveMapper.toEntity(dto);
-        ReserveEntity savedEntity = reserveRepository.save(entity);
-        return ReserveMapper.toResponseDTO(savedEntity);
+        ReserveEntity entity = reserveMapper.toEntity(dto);
+        ReserveEntity saved = reserveRepository.save(entity);
+        return reserveMapper.toResponseDTO(saved);
     }
 
     @Override
     public ReserveResponse getReserveById(Integer id) {
         ReserveEntity entity = reserveRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reserve entity not found"));
-        return ReserveMapper.toResponseDTO(entity);
+        return reserveMapper.toResponseDTO(entity);
     }
 }

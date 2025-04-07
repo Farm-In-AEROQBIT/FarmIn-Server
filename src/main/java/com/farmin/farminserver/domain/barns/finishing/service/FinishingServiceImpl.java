@@ -8,22 +8,38 @@ import com.farmin.farminserver.entity.barns.finishing.FinishingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class FinishingServiceImpl implements FinishingService {
+
     private final FinishingRepository finishingRepository;
 
     @Override
-    public FinishingResponse createFinishing(FinishingRequest dto) {
-        FinishingEntity entity = FinishingMapper.toEntity(dto);
-        FinishingEntity savedEntity = finishingRepository.save(entity);
-        return FinishingMapper.toResponseDTO(savedEntity);
+    public FinishingResponse createFinishing(FinishingRequest request) {
+        FinishingEntity entity = FinishingMapper.toEntity(request);
+        FinishingEntity saved = finishingRepository.save(entity);
+        return FinishingMapper.toResponseDTO(saved);
     }
 
     @Override
     public FinishingResponse getFinishingById(Integer id) {
         FinishingEntity entity = finishingRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Finishing entity not found"));
+                .orElseThrow(() -> new RuntimeException("Finishing not found"));
         return FinishingMapper.toResponseDTO(entity);
+    }
+
+    @Override
+    public List<FinishingResponse> getAllFinishing() {
+        return finishingRepository.findAll().stream()
+                .map(FinishingMapper::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteFinishing(Integer id) {
+        finishingRepository.deleteById(id);
     }
 }

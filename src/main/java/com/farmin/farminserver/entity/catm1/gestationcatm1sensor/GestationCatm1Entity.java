@@ -6,21 +6,21 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @Entity
-@Builder
+@Table(name = "GestationCatm1Sensor")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "GestationCatm1Sensor")
+@Builder
 public class GestationCatm1Entity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT 사용
-    @Column(name = "SensorID")
-    private Integer sensorID; // Integer로 정의
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "SensorIdc")
+    private Integer sensorIdc;
 
     @Column(name = "GestationID", nullable = false)
-    private String gestationID;
+    private Integer gestationID;
 
     @Column(name = "Temper")
     private String temper;

@@ -12,16 +12,16 @@ import java.util.Optional;
 public class UserMapper {
     public static UserEntity toEntity(JoinRequest joinRequest){
         return Optional.ofNullable(joinRequest).map(
-                it->{
-                    return UserEntity.builder()
-                            .username(joinRequest.getUsername())
-                            .name(joinRequest.getName())
-                            .password(joinRequest.getPassword())
-                            .email(joinRequest.getEmail())
-                            .role(Role.ROLE_USER)
-                            .createdAt(LocalDateTime.now())
-                            .build();
-                }
-        ).orElseThrow(()->new ApiException(ErrorCode.BAD_REQUEST));
+                it -> UserEntity.builder()
+                        .username(joinRequest.getUsername())
+                        .name(joinRequest.getName())
+                        .password(joinRequest.getPassword())
+                        .email(joinRequest.getEmail())
+                        .role(Role.ROLE_USER)
+                        .created_at(LocalDateTime.now())
+                        .updated_at(LocalDateTime.now())
+                        .build()
+        ).orElseThrow(() -> new ApiException(ErrorCode.BAD_REQUEST));
     }
 }
+

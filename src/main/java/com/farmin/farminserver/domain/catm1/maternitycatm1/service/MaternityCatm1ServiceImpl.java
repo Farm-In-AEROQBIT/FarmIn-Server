@@ -43,17 +43,15 @@ public class MaternityCatm1ServiceImpl implements MaternityCatm1Service {
 
     @Override
     public MaternityCatm1Response updateMaternityCatm1(int id, MaternityCatm1Request request) {
-        MaternityCatm1Entity entity = maternitycatm1Repository.findById(id)
+        var entity = maternitycatm1Repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Sensor not found"));
 
-        // 필드 업데이트
-        entity.setCo2(request.getCo2());
-        entity.setWtemper(request.getWTemper());
         entity.setTemper(request.getTemper());
+        entity.setWtemper(request.getWTemper());
         entity.setHumidity(request.getHumidity());
+        entity.setCo2(request.getCo2());
 
-        maternitycatm1Repository.save(entity);
-        return maternitycatm1mapper.toResponse(entity);
+        return maternitycatm1mapper.toResponse(maternitycatm1Repository.save(entity));
     }
 
     @Override

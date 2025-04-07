@@ -41,17 +41,15 @@ public class GrowingCatm1ServiceImpl implements GrowingCatm1Service {
 
     @Override
     public GrowingCatm1Response updateGrowingCatm1(int id, GrowingCatm1Request request) {
-        GrowingCatm1Entity entity = growingcatm1Repository.findById(id)
+        var entity = growingcatm1Repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Sensor not found"));
 
-        // 필드 업데이트
-        entity.setCo2(request.getCo2());
-        entity.setWtemper(request.getWTemper());
         entity.setTemper(request.getTemper());
+        entity.setWtemper(request.getWTemper());
         entity.setHumidity(request.getHumidity());
+        entity.setCo2(request.getCo2());
 
-        growingcatm1Repository.save(entity);
-        return growingcatm1mapper.toResponse(entity);
+        return growingcatm1mapper.toResponse(growingcatm1Repository.save(entity));
     }
 
     @Override

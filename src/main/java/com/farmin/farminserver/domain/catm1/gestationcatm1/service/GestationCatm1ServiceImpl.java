@@ -20,7 +20,7 @@ public class GestationCatm1ServiceImpl implements GestationCatm1Service {
 
     @Override
     public GestationCatm1Response createGestationCatm1(GestationCatm1Request request) {
-        GestationCatm1Entity entity = gestationcatm1mapper.toEntity(request);
+        var entity = gestationcatm1mapper.toEntity(request);
         gestationcatm1Repository.save(entity);
         return gestationcatm1mapper.toResponse(entity);
     }
@@ -34,25 +34,23 @@ public class GestationCatm1ServiceImpl implements GestationCatm1Service {
 
     @Override
     public GestationCatm1Response getGestationCatm1ById(int id) {
-        GestationCatm1Entity entity = gestationcatm1Repository.findById(id)
+        return gestationcatm1Repository.findById(id).map(gestationcatm1mapper::toResponse)
                 .orElseThrow(() -> new IllegalArgumentException("Sensor not found"));
-        return gestationcatm1mapper.toResponse(entity);
     }
 
     @Override
     public GestationCatm1Response updateGestationCatm1(int id, GestationCatm1Request request) {
-        GestationCatm1Entity entity = gestationcatm1Repository.findById(id)
+        var entity = gestationcatm1Repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Sensor not found"));
 
-        // 필드 업데이트
-        entity.setCo2(request.getCo2());
-        entity.setWtemper(request.getWTemper());
         entity.setTemper(request.getTemper());
+        entity.setWtemper(request.getWTemper());
         entity.setHumidity(request.getHumidity());
+        entity.setCo2(request.getCo2());
 
-        gestationcatm1Repository.save(entity);
-        return gestationcatm1mapper.toResponse(entity);
+        return gestationcatm1mapper.toResponse(gestationcatm1Repository.save(entity));
     }
+
 
     @Override
     public void deleteGestationCatm1(int id) {

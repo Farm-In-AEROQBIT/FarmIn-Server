@@ -9,25 +9,26 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PigletCatm1Mapper {
-    public static PigletCatm1Entity toEntity(PigletCatm1Request dto) {
+
+    public PigletCatm1Entity toEntity(PigletCatm1Request dto) {
         return PigletCatm1Entity.builder()
                 .pigletID(dto.getPigletID())
-                .co2(dto.getCo2())
-                .time(dto.getTime())
-                .humidity(dto.getHumidity())
                 .temper(dto.getTemper())
                 .wtemper(dto.getWTemper())
+                .humidity(dto.getHumidity())
+                .co2(dto.getCo2())
+                .time(dto.getTime())
                 .build();
     }
 
-    public PigletCatm1Response toResponse(PigletCatm1Entity entity){
+    public PigletCatm1Response toResponse(PigletCatm1Entity entity) {
         return PigletCatm1Response.builder()
-                .sensorid3(entity.getSensorID() != null ? entity.getSensorID().toString() : null) //integer -> String
+                .sensorIdc(entity.getSensorIdc())
                 .pigletID(entity.getPigletID())
-                .co2(entity.getCo2())
                 .temper(entity.getTemper())
-                .wtemper(entity.getWtemper())
+                .wTemper(entity.getWtemper())
                 .humidity(entity.getHumidity())
+                .co2(entity.getCo2())
                 .time(entity.getTime())
                 .build();
     }

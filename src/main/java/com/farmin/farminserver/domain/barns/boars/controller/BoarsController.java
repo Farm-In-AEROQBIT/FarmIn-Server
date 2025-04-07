@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/boars")
@@ -24,5 +26,19 @@ public class BoarsController {
     public ResponseEntity<Api<BoarsResponse>> getBoarsById(@PathVariable Integer id) {
         BoarsResponse response = boarsService.getBoarsById(id);
         return ResponseEntity.ok(Api.OK(response));
+    }
+
+    // ✅ 전체 목록 조회
+    @GetMapping
+    public ResponseEntity<Api<List<BoarsResponse>>> getAllBoars() {
+        List<BoarsResponse> responseList = boarsService.getAllBoars();
+        return ResponseEntity.ok(Api.OK(responseList));
+    }
+
+    // ✅ 삭제 기능
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Api<String>> deleteBoars(@PathVariable Integer id) {
+        boarsService.deleteBoarsById(id);
+        return ResponseEntity.ok(Api.OK("Deleted Boars with ID: " + id));
     }
 }

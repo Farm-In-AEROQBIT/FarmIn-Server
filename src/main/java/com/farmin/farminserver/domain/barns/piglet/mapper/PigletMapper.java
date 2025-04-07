@@ -3,18 +3,21 @@ package com.farmin.farminserver.domain.barns.piglet.mapper;
 import com.farmin.farminserver.domain.barns.piglet.dto.PigletRequest;
 import com.farmin.farminserver.domain.barns.piglet.dto.PigletResponse;
 import com.farmin.farminserver.entity.barns.piglet.PigletEntity;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PigletMapper {
-    public static PigletEntity toEntity(PigletRequest dto) {
+
+    public PigletEntity toEntity(PigletRequest dto) {
         return PigletEntity.builder()
-                .FarmID(dto.getFarmID())
+                .snFarmId(dto.getSnFarmId())
                 .build();
     }
 
-    public static PigletResponse toResponseDTO(PigletEntity entity) {
-        PigletResponse responseDTO = new PigletResponse();
-        responseDTO.setPigletID(entity.getId());
-        responseDTO.setFarmID(entity.getFarmID());
-        return responseDTO;
+    public PigletResponse toResponseDTO(PigletEntity entity) {
+        PigletResponse response = new PigletResponse();
+        response.setPigletId(entity.getPigletId());
+        response.setSnFarmId(entity.getSnFarmId());
+        return response;
     }
 }

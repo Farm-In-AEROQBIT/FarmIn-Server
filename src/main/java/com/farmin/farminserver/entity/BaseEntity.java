@@ -8,13 +8,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Data
 @MappedSuperclass
-public class BaseEntity {
-    //식별키
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+@Data
+@NoArgsConstructor
+public abstract class BaseEntity {
+    // 식별자 제거. 공통 필드만 둠
+    // 추후 createAt, updateAt 등 공통 컬럼 넣을 수 있음
 }

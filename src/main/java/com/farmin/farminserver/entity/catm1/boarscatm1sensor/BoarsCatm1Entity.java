@@ -1,26 +1,24 @@
 package com.farmin.farminserver.entity.catm1.boarscatm1sensor;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
 @Entity
-@Builder
+@Table(name = "BoarsCatm1Sensor")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "BoarsCatm1Sensor")
+@Builder
 public class BoarsCatm1Entity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT 사용
-    @Column(name = "SensorID")
-    private Integer sensorID; // Integer로 정의
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "SensorIdc")
+    private Integer sensorIdc;
 
     @Column(name = "BoarsID", nullable = false)
-    private String boarsID;
+    private Integer boarsID;
 
     @Column(name = "Temper")
     private String temper;

@@ -12,6 +12,5 @@ public interface GrowingSensorService {
     GrowingSensorResponse updateGrowingSensor(int id, GrowingSensorRequest request);
     void deleteGrowingSensor(int id);
 
-    // 추가된 메서드
     List<GrowingSensorResponse> getStatistics(String type, String year, String month, String weekOrDay);
 }

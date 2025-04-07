@@ -43,17 +43,15 @@ public class ReserveCatm1ServiceImpl implements ReserveCatm1Service {
 
     @Override
     public ReserveCatm1Response updateReserveCatm1(int id, ReserveCatm1Request request) {
-        ReserveCatm1Entity entity = reservecatm1Repository.findById(id)
+        var entity = reservecatm1Repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Sensor not found"));
 
-        // 필드 업데이트
-        entity.setCo2(request.getCo2());
-        entity.setWtemper(request.getWTemper());
         entity.setTemper(request.getTemper());
+        entity.setWtemper(request.getWTemper());
         entity.setHumidity(request.getHumidity());
+        entity.setCo2(request.getCo2());
 
-        reservecatm1Repository.save(entity);
-        return reservecatm1mapper.toResponse(entity);
+        return reservecatm1mapper.toResponse(reservecatm1Repository.save(entity));
     }
 
     @Override

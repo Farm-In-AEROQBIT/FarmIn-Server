@@ -15,6 +15,7 @@ import com.farmin.farminserver.entity.BaseEntity;
 @Table(name = "FarmInfo")
 public class FarmInfoEntity extends BaseEntity {
 
+    @Id
     @Column(unique = true, nullable = false, length = 50)
     private String FarmID;
 

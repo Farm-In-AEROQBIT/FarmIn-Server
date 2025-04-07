@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class GrowingRequest {
-    private String farmID;
+    private String snFarmId;
 }

@@ -8,26 +8,26 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class BoarsCatm1Mapper {
-    public static BoarsCatm1Entity toEntity(BoarsCatm1Request dto) {
+    public BoarsCatm1Entity toEntity(BoarsCatm1Request dto) {
         return BoarsCatm1Entity.builder()
-                .boarsID(dto.getBoarsID())
+                .boarsID(Integer.parseInt(dto.getBoarsID()))
                 .co2(dto.getCo2())
                 .time(dto.getTime())
                 .humidity(dto.getHumidity())
                 .temper(dto.getTemper())
-                .wtemper(dto.getWTemper())
+                .wtemper(dto.getWtemper())
                 .build();
     }
 
-    public BoarsCatm1Response toResponse(BoarsCatm1Entity entity){
+    public BoarsCatm1Response toResponse(BoarsCatm1Entity entity) {
         return BoarsCatm1Response.builder()
-                .sensorid3(entity.getSensorID() != null ? entity.getSensorID().toString() : null) //integer -> String
+                .sensoridc(entity.getSensorIdc())
                 .boarsID(entity.getBoarsID())
                 .co2(entity.getCo2())
+                .time(entity.getTime())
+                .humidity(entity.getHumidity())
                 .temper(entity.getTemper())
                 .wtemper(entity.getWtemper())
-                .humidity(entity.getHumidity())
-                .time(entity.getTime())
                 .build();
     }
 

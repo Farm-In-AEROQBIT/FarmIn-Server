@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://192.168.0.20:3306/FarmIn
+    url: jdbc:mysql://211.230.2.77:3306/FarmIn
     username: root
     password: ${DEV_DB_PASSWORD}
     driverClassName: com.mysql.cj.jdbc.Driver
