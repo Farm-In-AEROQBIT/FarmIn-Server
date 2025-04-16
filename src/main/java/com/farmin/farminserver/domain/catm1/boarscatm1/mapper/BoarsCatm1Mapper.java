@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class BoarsCatm1Mapper {
     public BoarsCatm1Entity toEntity(BoarsCatm1Request dto) {
         return BoarsCatm1Entity.builder()
-                .boarsID(Integer.parseInt(dto.getBoarsID()))
+                .boarsId(Integer.parseInt(dto.getBoarsId()))
                 .co2(dto.getCo2())
                 .time(dto.getTime())
                 .humidity(dto.getHumidity())
@@ -22,7 +22,7 @@ public class BoarsCatm1Mapper {
     public BoarsCatm1Response toResponse(BoarsCatm1Entity entity) {
         return BoarsCatm1Response.builder()
                 .sensoridc(entity.getSensorIdc())
-                .boarsID(entity.getBoarsID())
+                .boarsId(entity.getBoarsId())
                 .co2(entity.getCo2())
                 .time(entity.getTime())
                 .humidity(entity.getHumidity())

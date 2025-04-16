@@ -11,7 +11,7 @@ public class GrowingCatm1Mapper {
 
     public GrowingCatm1Entity toEntity(GrowingCatm1Request dto) {
         return GrowingCatm1Entity.builder()
-                .growingID(dto.getGrowingID())
+                .growingId(dto.getGrowingId())
                 .temper(dto.getTemper())
                 .wtemper(dto.getWTemper())
                 .humidity(dto.getHumidity())
@@ -23,7 +23,7 @@ public class GrowingCatm1Mapper {
     public GrowingCatm1Response toResponse(GrowingCatm1Entity entity) {
         return GrowingCatm1Response.builder()
                 .sensorIdc(entity.getSensorIdc())
-                .growingID(entity.getGrowingID())
+                .growingId(entity.getGrowingId())
                 .temper(entity.getTemper())
                 .wTemper(entity.getWtemper())
                 .humidity(entity.getHumidity())

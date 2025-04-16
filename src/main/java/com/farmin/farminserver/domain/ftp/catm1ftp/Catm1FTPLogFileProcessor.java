@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -133,10 +134,16 @@ public class Catm1FTPLogFileProcessor {
 
     private void processAllCSVFiles() {
         try {
-            Files.walk(Paths.get(LOCAL_SAVE_DIRECTORY))
+            List<Path> csvFiles = Files.walk(Paths.get(LOCAL_SAVE_DIRECTORY))
                     .filter(Files::isRegularFile)
                     .filter(p -> p.toString().endsWith(".csv"))
-                    .forEach(csvProcessor::processCSVFile);
+                    .collect(Collectors.toList());
+
+            // 각 파일에 대해 isLatestFile 설정 (마지막 파일만 true)
+            for(int i = 0; i < csvFiles.size(); i++) {
+                final boolean isLatestFile = (i == csvFiles.size() - 1);
+                csvProcessor.processCSVFile(csvFiles.get(i), isLatestFile);
+            }
         } catch (IOException e) {
             System.err.println("[CSV] 처리 실패");
             e.printStackTrace();

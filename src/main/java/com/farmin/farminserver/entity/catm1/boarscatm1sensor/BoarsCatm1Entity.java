@@ -3,6 +3,8 @@ package com.farmin.farminserver.entity.catm1.boarscatm1sensor;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "BoarsCatm1Sensor")
 @Getter
@@ -18,7 +20,7 @@ public class BoarsCatm1Entity {
     private Integer sensorIdc;
 
     @Column(name = "BoarsID", nullable = false)
-    private Integer boarsID;
+    private Integer boarsId;
 
     @Column(name = "Temper")
     private String temper;
@@ -33,5 +35,5 @@ public class BoarsCatm1Entity {
     private String co2;
 
     @Column(name = "Time")
-    private String time;
+    private LocalDateTime time;
 }

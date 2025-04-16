@@ -30,6 +30,9 @@ public class UserEntity {
     private String name;
 
     @Column(nullable = false)
+    private String phonenum;
+
+    @Column(nullable = false)
     private String email;
 
     @Enumerated(EnumType.STRING)

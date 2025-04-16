@@ -9,4 +9,7 @@ public interface FarmInfoService {
     FarmInfoResponse createFarmInfo(FarmInfoRequest request);
     List<FarmInfoResponse> getAllFarms();
     FarmInfoResponse getFarmById(int id);
+    FarmInfoResponse updateFarmInfo(int id, FarmInfoRequest request);
+    void deleteFarmInfo(int id);
+
 }

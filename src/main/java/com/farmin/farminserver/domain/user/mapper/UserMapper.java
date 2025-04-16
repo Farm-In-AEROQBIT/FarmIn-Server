@@ -16,6 +16,7 @@ public class UserMapper {
                         .username(joinRequest.getUsername())
                         .name(joinRequest.getName())
                         .password(joinRequest.getPassword())
+                        .phonenum(joinRequest.getPhonenum())
                         .email(joinRequest.getEmail())
                         .role(Role.ROLE_USER)
                         .created_at(LocalDateTime.now())

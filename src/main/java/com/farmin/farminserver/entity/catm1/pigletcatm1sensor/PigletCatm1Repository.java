@@ -4,19 +4,27 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PigletCatm1Repository extends JpaRepository<PigletCatm1Entity, Integer> {
 
-    @Query("SELECT p FROM PigletCatm1Entity p WHERE p.time LIKE CONCAT(:year, '%')")
-    List<PigletCatm1Entity> findByYear(@Param("year") String year);
+    boolean existsByPigletIdAndTime(Integer pigletId, LocalDateTime time);
 
-    @Query("SELECT p FROM PigletCatm1Entity p WHERE p.time LIKE CONCAT(:year, '-', :month, '%')")
-    List<PigletCatm1Entity> findByYearAndMonth(@Param("year") String year, @Param("month") String month);
+    // 연간 통계: 연도만 일치
+    @Query("SELECT g FROM PigletCatm1Entity g WHERE FUNCTION('YEAR', g.time) = :year")
+    List<PigletCatm1Entity> findByYear(@Param("year") int year);
 
-    @Query("SELECT p FROM PigletCatm1Entity p WHERE p.time BETWEEN :startDate AND :endDate")
-    List<PigletCatm1Entity> findByDateRange(@Param("startDate") String startDate, @Param("endDate") String endDate);
+    // 월간 통계: 연도와 월 일치
+    @Query("SELECT g FROM PigletCatm1Entity g WHERE FUNCTION('YEAR', g.time) = :year AND FUNCTION('MONTH', g.time) = :month")
+    List<PigletCatm1Entity> findByYearAndMonth(@Param("year") int year, @Param("month") int month);
 
-    @Query("SELECT p FROM PigletCatm1Entity p WHERE p.time LIKE CONCAT(:year, '-', :month, '-', :day, '%')")
-    List<PigletCatm1Entity> findByYearMonthAndDay(@Param("year") String year, @Param("month") String month, @Param("day") String day);
+    // 주간 통계: 특정 날짜 범위 (startDate ~ endDate)
+    @Query("SELECT g FROM PigletCatm1Entity g WHERE g.time BETWEEN :startDate AND :endDate")
+    List<PigletCatm1Entity> findByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+    // 일간 통계: 특정 연도-월-일 일치
+    @Query("SELECT g FROM PigletCatm1Entity g WHERE FUNCTION('YEAR', g.time) = " +
+            ":year AND FUNCTION('MONTH', g.time) = :month AND FUNCTION('DAY', g.time) = :day")
+    List<PigletCatm1Entity> findByYearMonthAndDay(@Param("year") int year, @Param("month") int month, @Param("day") int day);
 }

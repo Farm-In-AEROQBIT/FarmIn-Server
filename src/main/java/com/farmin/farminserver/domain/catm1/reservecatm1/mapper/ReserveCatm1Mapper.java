@@ -12,7 +12,7 @@ public class ReserveCatm1Mapper {
 
     public ReserveCatm1Entity toEntity(ReserveCatm1Request dto) {
         return ReserveCatm1Entity.builder()
-                .reserveID(dto.getReserveID())
+                .reserveId(dto.getReserveId())
                 .temper(dto.getTemper())
                 .wtemper(dto.getWTemper())
                 .humidity(dto.getHumidity())
@@ -24,7 +24,7 @@ public class ReserveCatm1Mapper {
     public ReserveCatm1Response toResponse(ReserveCatm1Entity entity) {
         return ReserveCatm1Response.builder()
                 .sensorIdc(entity.getSensorIdc())
-                .reserveID(entity.getReserveID())
+                .reserveId(entity.getReserveId())
                 .temper(entity.getTemper())
                 .wTemper(entity.getWtemper())
                 .humidity(entity.getHumidity())

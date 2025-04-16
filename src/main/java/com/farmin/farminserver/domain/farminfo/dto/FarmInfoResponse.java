@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class FarmInfoResponse {
-    private String farmId;
+    private Integer farmId;
     private String farmName;
-    private String userId;
+    private Integer userId;
 }

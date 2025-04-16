@@ -7,22 +7,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import com.farmin.farminserver.entity.BaseEntity;
 
-@Data
 @Entity
-@Builder
+@Table(name = "FarmInfo")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "FarmInfo")
-public class FarmInfoEntity extends BaseEntity {
+@Builder
+public class FarmInfoEntity {
 
     @Id
-    @Column(unique = true, nullable = false, length = 50)
-    private String FarmID;
-
-    @Column(nullable = false, length = 50)
-    private String FarmName;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer farmId;
 
     @Column(nullable = false, length = 100)
-    private String UserID;
+    private String farmName;
 
+    @Column(nullable = false)
+    private Integer userId;
 }
+

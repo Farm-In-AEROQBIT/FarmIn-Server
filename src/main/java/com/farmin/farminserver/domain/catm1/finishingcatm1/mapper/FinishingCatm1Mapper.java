@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class FinishingCatm1Mapper {
     public FinishingCatm1Entity toEntity(FinishingCatm1Request dto) {
         return FinishingCatm1Entity.builder()
-                .finishingID(dto.getFinishingID())
+                .finishingId(dto.getFinishingId())
                 .temper(dto.getTemper())
                 .wtemper(dto.getWTemper())
                 .humidity(dto.getHumidity())
@@ -23,7 +23,7 @@ public class FinishingCatm1Mapper {
     public FinishingCatm1Response toResponse(FinishingCatm1Entity entity) {
         return FinishingCatm1Response.builder()
                 .sensorIdc(entity.getSensorIdc())
-                .finishingID(entity.getFinishingID())
+                .finishingId(entity.getFinishingId())
                 .temper(entity.getTemper())
                 .wTemper(entity.getWtemper())
                 .humidity(entity.getHumidity())

@@ -8,16 +8,16 @@ public class FarmInfoMapper {
 
     public static FarmInfoEntity toEntity(FarmInfoRequest request) {
         return FarmInfoEntity.builder()
-                .FarmName(request.getFarmName())
-                .UserID(request.getUserId())
+                .farmName(request.getFarmName())
+                .userId(request.getUserId())
                 .build();
     }
 
     public static FarmInfoResponse toResponse(FarmInfoEntity entity) {
         return FarmInfoResponse.builder()
-                .farmId(String.valueOf(entity.getFarmID()))
+                .farmId(entity.getFarmId())
                 .farmName(entity.getFarmName())
-                .userId(entity.getUserID())
+                .userId(entity.getUserId())
                 .build();
     }
 }

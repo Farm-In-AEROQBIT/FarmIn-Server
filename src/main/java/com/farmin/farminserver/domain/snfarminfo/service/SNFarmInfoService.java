@@ -11,7 +11,4 @@ public interface SNFarmInfoService {
     List<SNFarmInfoResponse> getAllSNFarmInfos();
     SNFarmInfoResponse updateSNFarmInfo(String snFarmId, SNFarmInfoRequest request);
     void deleteSNFarmInfo(String snFarmId);
-
-
 }
-

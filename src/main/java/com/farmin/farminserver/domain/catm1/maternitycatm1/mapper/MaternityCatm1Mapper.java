@@ -11,7 +11,7 @@ public class MaternityCatm1Mapper {
 
     public MaternityCatm1Entity toEntity(MaternityCatm1Request dto) {
         return MaternityCatm1Entity.builder()
-                .maternityID(dto.getMaternityID())
+                .maternityId(dto.getMaternityId())
                 .temper(dto.getTemper())
                 .wtemper(dto.getWTemper())
                 .humidity(dto.getHumidity())
@@ -23,7 +23,7 @@ public class MaternityCatm1Mapper {
     public MaternityCatm1Response toResponse(MaternityCatm1Entity entity) {
         return MaternityCatm1Response.builder()
                 .sensorIdc(entity.getSensorIdc())
-                .maternityID(entity.getMaternityID())
+                .maternityId(entity.getMaternityId())
                 .temper(entity.getTemper())
                 .wTemper(entity.getWtemper())
                 .humidity(entity.getHumidity())

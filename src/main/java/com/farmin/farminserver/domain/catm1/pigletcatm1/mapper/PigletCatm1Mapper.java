@@ -12,7 +12,7 @@ public class PigletCatm1Mapper {
 
     public PigletCatm1Entity toEntity(PigletCatm1Request dto) {
         return PigletCatm1Entity.builder()
-                .pigletID(dto.getPigletID())
+                .pigletId(dto.getPigletId())
                 .temper(dto.getTemper())
                 .wtemper(dto.getWTemper())
                 .humidity(dto.getHumidity())
@@ -24,7 +24,7 @@ public class PigletCatm1Mapper {
     public PigletCatm1Response toResponse(PigletCatm1Entity entity) {
         return PigletCatm1Response.builder()
                 .sensorIdc(entity.getSensorIdc())
-                .pigletID(entity.getPigletID())
+                .pigletId(entity.getPigletId())
                 .temper(entity.getTemper())
                 .wTemper(entity.getWtemper())
                 .humidity(entity.getHumidity())

@@ -15,6 +15,8 @@ public class JoinRequest {
     @NotBlank
     private String password;
     @NotBlank
+    private String phonenum;
+    @NotBlank
     @Email(message = "이메일을 양식을 지켜주세요.")
     private String email;
 }

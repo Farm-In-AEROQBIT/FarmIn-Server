@@ -1,5 +1,6 @@
 package com.farmin.farminserver.domain.user.service;
 
+import com.farmin.farminserver.entity.user.enums.Role;
 import lombok.RequiredArgsConstructor;
 import com.farmin.farminserver.common.error.ErrorCode;
 import com.farmin.farminserver.common.exception.ApiException;
@@ -52,6 +53,7 @@ public class UserServiceImpl implements UserService {
         return LoginResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .isAdmin(userEntity.getRole() == Role.ROLE_ADMIN)
                 .build();
     }
 

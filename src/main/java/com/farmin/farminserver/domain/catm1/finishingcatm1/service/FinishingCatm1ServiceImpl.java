@@ -1,13 +1,16 @@
 package com.farmin.farminserver.domain.catm1.finishingcatm1.service;
 
+import com.farmin.farminserver.domain.catm1.boarscatm1.dto.BoarsCatm1Response;
 import com.farmin.farminserver.domain.catm1.finishingcatm1.dto.FinishingCatm1Request;
 import com.farmin.farminserver.domain.catm1.finishingcatm1.dto.FinishingCatm1Response;
 import com.farmin.farminserver.domain.catm1.finishingcatm1.mapper.FinishingCatm1Mapper;
+import com.farmin.farminserver.entity.catm1.boarscatm1sensor.BoarsCatm1Entity;
 import com.farmin.farminserver.entity.catm1.finishingcatm1sensor.FinishingCatm1Entity;
 import com.farmin.farminserver.entity.catm1.finishingcatm1sensor.FinishingCatm1Repository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -65,21 +68,28 @@ public class FinishingCatm1ServiceImpl implements FinishingCatm1Service {
         List<FinishingCatm1Entity> catm1;
 
         switch (type.toLowerCase()) {
-            case "yearly":
-                catm1 = finishingcatm1Repository.findByYear(year);
-                break;
-            case "monthly":
-                catm1 = finishingcatm1Repository.findByYearAndMonth(year, month);
-                break;
-            case "weekly":
-                String[] dateRange = calculateDateRange(year, month, weekOrDay);
-                catm1 = finishingcatm1Repository.findByDateRange(dateRange[0], dateRange[1]);
-                break;
-            case "daily":
-                catm1 = finishingcatm1Repository.findByYearMonthAndDay(year, month, weekOrDay);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid type: " + type);
+            case "yearly" -> {
+                int parsedYear = Integer.parseInt(year);
+                catm1 = finishingcatm1Repository.findByYear(parsedYear);
+            }
+            case "monthly" -> {
+                int parsedYear = Integer.parseInt(year);
+                int parsedMonth = Integer.parseInt(month);
+                catm1 = finishingcatm1Repository.findByYearAndMonth(parsedYear, parsedMonth);
+            }
+            case "weekly" -> {
+                String[] range = calculateDateRange(year, month, weekOrDay);
+                LocalDateTime start = LocalDateTime.parse(range[0] + "T00:00:00");
+                LocalDateTime end = LocalDateTime.parse(range[1] + "T23:59:59");
+                catm1 = finishingcatm1Repository.findByDateRange(start, end);
+            }
+            case "daily" -> {
+                int parsedYear = Integer.parseInt(year);
+                int parsedMonth = Integer.parseInt(month);
+                int parsedDay = Integer.parseInt(weekOrDay);
+                catm1 = finishingcatm1Repository.findByYearMonthAndDay(parsedYear, parsedMonth, parsedDay);
+            }
+            default -> throw new IllegalArgumentException("Invalid type: " + type);
         }
 
         return catm1.stream()

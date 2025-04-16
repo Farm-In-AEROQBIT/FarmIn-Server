@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "ReserveCatm1Sensor")
 @Data
@@ -20,7 +22,7 @@ public class ReserveCatm1Entity {
     private Integer sensorIdc;
 
     @Column(name = "ReserveID", nullable = false)
-    private Integer reserveID;
+    private Integer reserveId;
 
     @Column(name = "Temper")
     private String temper;
@@ -35,5 +37,5 @@ public class ReserveCatm1Entity {
     private String co2;
 
     @Column(name = "Time")
-    private String time;
+    private LocalDateTime time;
 }

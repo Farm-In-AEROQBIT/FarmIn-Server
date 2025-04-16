@@ -8,6 +8,7 @@ import com.farmin.farminserver.entity.catm1.boarscatm1sensor.BoarsCatm1Repositor
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,21 +69,28 @@ public class BoarsCatm1ServiceImpl implements BoarsCatm1Service {
         List<BoarsCatm1Entity> catm1;
 
         switch (type.toLowerCase()) {
-            case "yearly":
-                catm1 = boarsCatm1Repository.findByYear(year);
-                break;
-            case "monthly":
-                catm1 = boarsCatm1Repository.findByYearAndMonth(year, month);
-                break;
-            case "weekly":
-                String[] dateRange = calculateDateRange(year, month, weekOrDay);
-                catm1 = boarsCatm1Repository.findByDateRange(dateRange[0], dateRange[1]);
-                break;
-            case "daily":
-                catm1 = boarsCatm1Repository.findByYearMonthAndDay(year, month, weekOrDay);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid type: " + type);
+            case "yearly" -> {
+                int parsedYear = Integer.parseInt(year);
+                catm1 = boarsCatm1Repository.findByYear(parsedYear);
+            }
+            case "monthly" -> {
+                int parsedYear = Integer.parseInt(year);
+                int parsedMonth = Integer.parseInt(month);
+                catm1 = boarsCatm1Repository.findByYearAndMonth(parsedYear, parsedMonth);
+            }
+            case "weekly" -> {
+                String[] range = calculateDateRange(year, month, weekOrDay);
+                LocalDateTime start = LocalDateTime.parse(range[0] + "T00:00:00");
+                LocalDateTime end = LocalDateTime.parse(range[1] + "T23:59:59");
+                catm1 = boarsCatm1Repository.findByDateRange(start, end);
+            }
+            case "daily" -> {
+                int parsedYear = Integer.parseInt(year);
+                int parsedMonth = Integer.parseInt(month);
+                int parsedDay = Integer.parseInt(weekOrDay);
+                catm1 = boarsCatm1Repository.findByYearMonthAndDay(parsedYear, parsedMonth, parsedDay);
+            }
+            default -> throw new IllegalArgumentException("Invalid type: " + type);
         }
 
         return catm1.stream()
@@ -100,4 +108,5 @@ public class BoarsCatm1ServiceImpl implements BoarsCatm1Service {
 
         return new String[]{startDate, endDate};
     }
+
 }
