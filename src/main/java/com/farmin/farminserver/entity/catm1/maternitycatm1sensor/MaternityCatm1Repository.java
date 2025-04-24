@@ -1,15 +1,22 @@
 package com.farmin.farminserver.entity.catm1.maternitycatm1sensor;
 
+import com.farmin.farminserver.entity.barns.maternity.MaternityEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
+@Repository
 public interface MaternityCatm1Repository extends JpaRepository<MaternityCatm1Entity, Integer> {
 
     boolean existsByMaternityIdAndTime(Integer maternityId, LocalDateTime time);
+    //Optional<MaternityEntity> findBySnFarmId(String snFarmId);
+
+    List<MaternityCatm1Entity> findByMaternityId(Integer maternityId);
 
     // 연간 통계: 연도만 일치
     @Query("SELECT g FROM MaternityCatm1Entity g WHERE FUNCTION('YEAR', g.time) = :year")

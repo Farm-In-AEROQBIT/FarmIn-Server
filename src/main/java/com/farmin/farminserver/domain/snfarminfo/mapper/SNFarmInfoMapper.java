@@ -11,6 +11,7 @@ public class SNFarmInfoMapper {
     public SNFarmInfoEntity toEntity(SNFarmInfoRequest request) {
         return SNFarmInfoEntity.builder()
                 .farmId(request.getFarmId())
+                .snFarmId(request.getSnFarmId())
                 .build();
     }
 

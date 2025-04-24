@@ -6,6 +6,7 @@ import com.farmin.farminserver.domain.farminfo.dto.FarmInfoRequest;
 import com.farmin.farminserver.domain.farminfo.dto.FarmInfoResponse;
 import com.farmin.farminserver.domain.farminfo.mapper.FarmInfoMapper;
 import com.farmin.farminserver.entity.farminfo.FarmInfoRepository;
+import com.farmin.farminserver.entity.user.UserEntity;
 import com.farmin.farminserver.entity.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -66,5 +67,24 @@ public class FarmInfoServiceImpl implements FarmInfoService {
         }
         farmInfoRepository.deleteById(id);
     }
-}
 
+    @Override
+    public List<FarmInfoResponse> getFarmsByUserId(Integer userId) {
+        return farmInfoRepository.findByUserId(userId).stream()
+                .map(FarmInfoMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<FarmInfoResponse> getFarmsByUsername(String username) {
+        UserEntity user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new ApiException(ErrorCode.NOT_FOUND, "해당 사용자를 찾을 수 없습니다.");
+        }
+
+        // UserRepository returns Long id but FarmInfo uses Integer userId
+        // We need to convert it to match the expected type
+        Integer userId = user.getId().intValue();
+        return getFarmsByUserId(userId);
+    }
+}

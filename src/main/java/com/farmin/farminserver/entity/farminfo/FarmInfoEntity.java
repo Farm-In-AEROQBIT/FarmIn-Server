@@ -13,7 +13,7 @@ import com.farmin.farminserver.entity.BaseEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FarmInfoEntity {
+public class FarmInfoEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,4 +25,3 @@ public class FarmInfoEntity {
     @Column(nullable = false)
     private Integer userId;
 }
-

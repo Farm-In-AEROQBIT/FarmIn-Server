@@ -1,15 +1,20 @@
 package com.farmin.farminserver.entity.catm1.finishingcatm1sensor;
 
+import com.farmin.farminserver.entity.barns.finishing.FinishingEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface FinishingCatm1Repository extends JpaRepository<FinishingCatm1Entity, Integer> {
 
     boolean existsByFinishingIdAndTime(Integer finishingId, LocalDateTime time);
+    //Optional<FinishingEntity> findBySnFarmId(String snFarmId);
+
+    List<FinishingCatm1Entity> findByFinishingId(Integer finishingId);
 
     // 연간 통계: 연도만 일치
     @Query("SELECT g FROM FinishingCatm1Entity g WHERE FUNCTION('YEAR', g.time) = :year")

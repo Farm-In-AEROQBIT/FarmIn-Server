@@ -1,15 +1,20 @@
 package com.farmin.farminserver.entity.catm1.gestationcatm1sensor;
 
+import com.farmin.farminserver.entity.barns.gestation.GestationEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface GestationCatm1Repository extends JpaRepository<GestationCatm1Entity, Integer> {
 
     boolean existsByGestationIdAndTime(Integer gestationId, LocalDateTime time);
+    //Optional<GestationEntity> findBySnFarmId(String snFarmId);
+
+    List<GestationCatm1Entity> findByGestationId(Integer gestationId);
 
     // 연간 통계: 연도만 일치
     @Query("SELECT g FROM GestationCatm1Entity g WHERE FUNCTION('YEAR', g.time) = :year")

@@ -1,16 +1,20 @@
 package com.farmin.farminserver.entity.catm1.reservecatm1sensor;
 
-import com.farmin.farminserver.entity.catm1.boarscatm1sensor.BoarsCatm1Entity;
+import com.farmin.farminserver.entity.barns.reserve.ReserveEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface ReserveCatm1Repository extends JpaRepository<ReserveCatm1Entity, Integer> {
 
     boolean existsByReserveIdAndTime(Integer reserveId, LocalDateTime time);
+    //Optional<ReserveEntity> findBySnFarmId(String snFarmId);
+
+    List<ReserveCatm1Entity> findByReserveId(Integer reserveId);
 
     // 연간 통계: 연도만 일치
     @Query("SELECT g FROM ReserveCatm1Entity g WHERE FUNCTION('YEAR', g.time) = :year")

@@ -9,7 +9,8 @@ public interface FarmInfoService {
     FarmInfoResponse createFarmInfo(FarmInfoRequest request);
     List<FarmInfoResponse> getAllFarms();
     FarmInfoResponse getFarmById(int id);
+    List<FarmInfoResponse> getFarmsByUserId(Integer userId);
+    List<FarmInfoResponse> getFarmsByUsername(String username);
     FarmInfoResponse updateFarmInfo(int id, FarmInfoRequest request);
     void deleteFarmInfo(int id);
-
 }

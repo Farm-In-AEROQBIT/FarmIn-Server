@@ -1,12 +1,8 @@
 package com.farmin.farminserver.domain.catm1.maternitycatm1.service;
 
-import com.farmin.farminserver.domain.catm1.boarscatm1.dto.BoarsCatm1Response;
 import com.farmin.farminserver.domain.catm1.maternitycatm1.dto.MaternityCatm1Request;
 import com.farmin.farminserver.domain.catm1.maternitycatm1.dto.MaternityCatm1Response;
 import com.farmin.farminserver.domain.catm1.maternitycatm1.mapper.MaternityCatm1Mapper;
-import com.farmin.farminserver.entity.catm1.boarscatm1sensor.BoarsCatm1Entity;
-import com.farmin.farminserver.entity.catm1.growingcatm1sensor.GrowingCatm1Entity;
-import com.farmin.farminserver.entity.catm1.growingcatm1sensor.GrowingCatm1Repository;
 import com.farmin.farminserver.entity.catm1.maternitycatm1sensor.MaternityCatm1Entity;
 import com.farmin.farminserver.entity.catm1.maternitycatm1sensor.MaternityCatm1Repository;
 import lombok.RequiredArgsConstructor;

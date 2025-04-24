@@ -20,7 +20,10 @@ public class FinishingServiceImpl implements FinishingService {
     @Override
     public FinishingResponse createFinishing(FinishingRequest request) {
         FinishingEntity entity = FinishingMapper.toEntity(request);
+        entity.setSnFarmId(request.getSnFarmId());
+
         FinishingEntity saved = finishingRepository.save(entity);
+
         return FinishingMapper.toResponseDTO(saved);
     }
 

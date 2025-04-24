@@ -1,5 +1,13 @@
 package com.farmin.farminserver.domain.user.service;
 
+import com.farmin.farminserver.domain.user.dto.UserUpdateRequest;
+import com.farmin.farminserver.entity.barns.boars.BoarsRepository;
+import com.farmin.farminserver.entity.barns.finishing.FinishingRepository;
+import com.farmin.farminserver.entity.barns.gestation.GestationRepository;
+import com.farmin.farminserver.entity.barns.growing.GrowingRepository;
+import com.farmin.farminserver.entity.barns.maternity.MaternityRepository;
+import com.farmin.farminserver.entity.barns.piglet.PigletRepository;
+import com.farmin.farminserver.entity.barns.reserve.ReserveRepository;
 import com.farmin.farminserver.entity.user.enums.Role;
 import lombok.RequiredArgsConstructor;
 import com.farmin.farminserver.common.error.ErrorCode;
@@ -24,6 +32,14 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtUtils jwtUtils;
+
+    private final FinishingRepository finishingRepository;
+    private final GrowingRepository growingRepository;
+    private final MaternityRepository maternityRepository;
+    private final GestationRepository gestationRepository;
+    private final PigletRepository pigletRepository;
+    private final BoarsRepository boarsRepository;
+    private final ReserveRepository reserveRepository;
 
     @Override
     public void join(JoinRequest joinRequest) {
@@ -60,6 +76,35 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserEntity> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    @Override
+    public UserEntity updateUser(Integer userId, UserUpdateRequest updateRequest) {
+        UserEntity userEntity = userRepository.findById(userId)
+                .orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND, "해당 유저를 찾을 수 없습니다."));
+
+        // 요청에 포함된 필드만 업데이트
+        if (updateRequest.getName() != null && !updateRequest.getName().isEmpty()) {
+            userEntity.setName(updateRequest.getName());
+        }
+
+        if (updateRequest.getEmail() != null && !updateRequest.getEmail().isEmpty()) {
+            userEntity.setEmail(updateRequest.getEmail());
+        }
+
+        if (updateRequest.getPhonenum() != null && !updateRequest.getPhonenum().isEmpty()) {
+            userEntity.setPhonenum(updateRequest.getPhonenum());
+        }
+
+        // 비밀번호가 제공된 경우에만 업데이트
+        if (updateRequest.getPassword() != null && !updateRequest.getPassword().isEmpty()) {
+            // 비밀번호 암호화 처리
+            String encodedPassword = bCryptPasswordEncoder.encode(updateRequest.getPassword());
+            userEntity.setPassword(encodedPassword);
+        }
+
+        // 업데이트 시간 자동 갱신 (UpdateTimestamp 어노테이션이 있으므로 자동 처리)
+        return userRepository.save(userEntity);
     }
 
     @Override

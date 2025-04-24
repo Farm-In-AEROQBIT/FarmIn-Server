@@ -7,6 +7,8 @@ import com.farmin.farminserver.domain.farminfo.dto.FarmInfoResponse;
 import com.farmin.farminserver.domain.farminfo.service.FarmInfoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,7 +26,6 @@ public class FarmInfoController {
         return Api.OK(farmInfoService.createFarmInfo(request));
     }
 
-
     @GetMapping
     public Api<List<FarmInfoResponse>> getAllFarms() {
         return Api.OK(farmInfoService.getAllFarms());
@@ -33,6 +34,13 @@ public class FarmInfoController {
     @GetMapping("/{id}")
     public Api<FarmInfoResponse> getFarmById(@PathVariable int id) {
         return Api.OK(farmInfoService.getFarmById(id));
+    }
+
+    @GetMapping("/mine")
+    public Api<List<FarmInfoResponse>> getMyFarms(@AuthenticationPrincipal UserDetails userDetails) {
+        // Get username from authenticated user
+        String username = userDetails.getUsername();
+        return Api.OK(farmInfoService.getFarmsByUsername(username));
     }
 
     @PutMapping("/{id}")
@@ -45,6 +53,4 @@ public class FarmInfoController {
         farmInfoService.deleteFarmInfo(id);
         return Api.OK(null);
     }
-
-
 }

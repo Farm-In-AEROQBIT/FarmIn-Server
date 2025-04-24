@@ -1,15 +1,22 @@
 package com.farmin.farminserver.entity.catm1.boarscatm1sensor;
 
+import com.farmin.farminserver.entity.barns.boars.BoarsEntity;
+import com.farmin.farminserver.entity.barns.maternity.MaternityEntity;
+import com.farmin.farminserver.entity.catm1.maternitycatm1sensor.MaternityCatm1Entity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BoarsCatm1Repository extends JpaRepository<BoarsCatm1Entity, Integer>{
 
     boolean existsByBoarsIdAndTime(Integer boarsId, LocalDateTime time);
+    //Optional<BoarsEntity> findBySnFarmId(String snFarmId);
+
+    List<BoarsCatm1Entity> findByBoarsId(Integer boarsId);
 
     // 연간 통계: 연도만 일치
     @Query("SELECT g FROM BoarsCatm1Entity g WHERE FUNCTION('YEAR', g.time) = :year")

@@ -12,7 +12,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/reservecatm1")
-public class ReserveCatm1Controller {
+public class    ReserveCatm1Controller {
 
     private final ReserveCatm1Service reserveCatm1Service;
 

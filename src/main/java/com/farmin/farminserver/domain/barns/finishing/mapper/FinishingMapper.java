@@ -8,7 +8,7 @@ public class FinishingMapper {
 
     public static FinishingEntity toEntity(FinishingRequest dto) {
         return FinishingEntity.builder()
-                .snFarmId(dto.getSnfarmID())
+                .snFarmId(dto.getSnFarmId())
                 .build();
     }
 
