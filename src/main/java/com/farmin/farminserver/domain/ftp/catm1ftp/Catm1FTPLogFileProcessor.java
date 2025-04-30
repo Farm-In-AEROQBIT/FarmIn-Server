@@ -20,8 +20,9 @@ public class Catm1FTPLogFileProcessor {
     private static final int FTP_PORT = 2301;
     private static final String FTP_USER = "farmin";
     private static final String FTP_PASSWORD = "230130";
-    private static final String FTP_LOG_DIRECTORY = "/home/farmin/ftp/modem";
-    private static final String LOCAL_SAVE_DIRECTORY = "/home/farmin/바탕화면/Catm1/log";
+
+    private static final String FTP_MODEM_PATH = "/home/farmin/ftp/modem";
+    private static final String LOCAL_BASE_DIRECTORY = "/home/farmin/바탕화면/Catm1/log";
 
     private static final int RETRY_COUNT = 3;
     private static final long RETRY_DELAY_MS = 10_000;
@@ -83,30 +84,157 @@ public class Catm1FTPLogFileProcessor {
             if (ftpService.connect(FTP_SERVER, FTP_PORT, FTP_USER, FTP_PASSWORD)) {
                 try {
                     ftpService.configure();
-                    FTPFile[] files = ftpService.listFiles(FTP_LOG_DIRECTORY);
-                    if (files == null || files.length == 0) {
-                        System.out.println("[FTP] 파일 없음");
+
+                    // 현재 작업 디렉토리 출력
+                    try {
+                        String currentDir = ftpService.getClient().printWorkingDirectory();
+                        System.out.println("[FTP] 현재 작업 디렉토리: " + currentDir);
+                    } catch (IOException e) {
+                        System.err.println("[FTP] 현재 디렉토리 확인 실패: " + e.getMessage());
+                    }
+
+                    // 기본 디렉토리 생성
+                    try {
+                        Files.createDirectories(Paths.get(LOCAL_BASE_DIRECTORY));
+                    } catch (IOException e) {
+                        System.err.println("[FTP] 기본 디렉토리 생성 실패: " + e.getMessage());
                         return false;
                     }
 
-                    Files.createDirectories(Paths.get(LOCAL_SAVE_DIRECTORY));
+                    // 메인 모뎀 디렉토리 처리
+                    boolean anySuccess = false;
 
-                    for (FTPFile file : files) {
-                        if (file.isFile() && file.getName().endsWith(".log")) {
-                            String remotePath = FTP_LOG_DIRECTORY + "/" + file.getName();
-                            String localPath = LOCAL_SAVE_DIRECTORY + "/" + file.getName();
+                    try {
+                        System.out.println("[FTP] 메인 모뎀 디렉토리 확인: " + FTP_MODEM_PATH);
+                        FTPFile[] farmDirs = ftpService.getClient().listFiles(FTP_MODEM_PATH);
 
-                            if (ftpService.downloadFile(remotePath, localPath)) {
-                                logConverter.convertLogToCSV(Paths.get(localPath));
+                        if (farmDirs != null && farmDirs.length > 0) {
+                            System.out.println("[FTP] 농장 디렉토리 수: " + farmDirs.length);
+
+                            // 각 농장 디렉토리 처리
+                            for (FTPFile farmDir : farmDirs) {
+                                if (farmDir.isDirectory() && !farmDir.getName().equals(".") && !farmDir.getName().equals("..")) {
+                                    String farmName = farmDir.getName();
+                                    System.out.println("[FTP] 농장 디렉토리 처리: " + farmName);
+
+                                    // 로컬 농장 디렉토리 생성
+                                    Path localFarmDir = Paths.get(LOCAL_BASE_DIRECTORY, farmName);
+                                    try {
+                                        Files.createDirectories(localFarmDir);
+                                        System.out.println("[FTP] 로컬 농장 디렉토리 생성 또는 확인: " + localFarmDir);
+                                    } catch (IOException e) {
+                                        System.err.println("[FTP] 로컬 농장 디렉토리 생성 실패: " + e.getMessage());
+                                        continue;
+                                    }
+
+                                    String farmPath = FTP_MODEM_PATH + "/" + farmName;
+
+                                    // 농장 디렉토리 내의 모든 파일 목록
+                                    FTPFile[] farmFiles = ftpService.getClient().listFiles(farmPath);
+
+                                    if (farmFiles != null && farmFiles.length > 0) {
+                                        System.out.println("[FTP] 농장 " + farmName + "에서 " + farmFiles.length + "개 항목 발견");
+
+                                        // 로그 파일 카운터
+                                        int logFileCount = 0;
+
+                                        // 디렉토리 내의 모든 파일 처리
+                                        for (FTPFile farmFile : farmFiles) {
+                                            if (farmFile.isFile()) {
+                                                String fileName = farmFile.getName();
+
+                                                // .log 확장자를 가진 파일만 처리
+                                                if (fileName.toLowerCase().endsWith(".log")) {
+                                                    String remotePath = farmPath + "/" + fileName;
+                                                    String localPath = localFarmDir.resolve(fileName).toString();
+
+                                                    System.out.println("[FTP] 로그 파일 다운로드 시도: " + remotePath + " -> " + localPath);
+
+                                                    if (ftpService.downloadFile(remotePath, localPath)) {
+                                                        System.out.println("[FTP] 로그 파일 다운로드 성공: " + fileName);
+                                                        logFileCount++;
+
+                                                        // CSV로 변환
+                                                        logConverter.convertLogToCSV(Paths.get(localPath));
+                                                        anySuccess = true;
+                                                    } else {
+                                                        System.err.println("[FTP] 로그 파일 다운로드 실패: " + fileName);
+                                                    }
+                                                }
+                                            } else if (farmFile.isDirectory() && !farmFile.getName().equals(".") && !farmFile.getName().equals("..")) {
+                                                // 서브 디렉토리가 있는 경우 (추가 레벨)
+                                                String subDirName = farmFile.getName();
+                                                String subDirPath = farmPath + "/" + subDirName;
+
+                                                // 서브 디렉토리용 로컬 디렉토리 생성
+                                                Path localSubDir = localFarmDir.resolve(subDirName);
+                                                try {
+                                                    Files.createDirectories(localSubDir);
+                                                    System.out.println("[FTP] 로컬 서브 디렉토리 생성 또는 확인: " + localSubDir);
+                                                } catch (IOException e) {
+                                                    System.err.println("[FTP] 로컬 서브 디렉토리 생성 실패: " + e.getMessage());
+                                                    continue;
+                                                }
+
+                                                System.out.println("[FTP] 서브 디렉토리 확인: " + subDirPath);
+
+                                                FTPFile[] subDirFiles = ftpService.getClient().listFiles(subDirPath);
+
+                                                if (subDirFiles != null && subDirFiles.length > 0) {
+                                                    System.out.println("[FTP] 서브 디렉토리 " + subDirName + "에서 " + subDirFiles.length + "개 항목 발견");
+
+                                                    for (FTPFile subFile : subDirFiles) {
+                                                        if (subFile.isFile()) {
+                                                            String subFileName = subFile.getName();
+
+                                                            // .log 확장자를 가진 파일만 처리
+                                                            if (subFileName.toLowerCase().endsWith(".log")) {
+                                                                String subRemotePath = subDirPath + "/" + subFileName;
+                                                                String subLocalPath = localSubDir.resolve(subFileName).toString();
+
+                                                                System.out.println("[FTP] 서브 로그 파일 다운로드 시도: " + subRemotePath + " -> " + subLocalPath);
+
+                                                                if (ftpService.downloadFile(subRemotePath, subLocalPath)) {
+                                                                    System.out.println("[FTP] 서브 로그 파일 다운로드 성공: " + subFileName);
+                                                                    logFileCount++;
+
+                                                                    // CSV로 변환
+                                                                    logConverter.convertLogToCSV(Paths.get(subLocalPath));
+                                                                    anySuccess = true;
+                                                                } else {
+                                                                    System.err.println("[FTP] 서브 로그 파일 다운로드 실패: " + subFileName);
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        System.out.println("[FTP] 농장 " + farmName + "에서 " + logFileCount + "개 로그 파일 다운로드 완료");
+                                    } else {
+                                        System.out.println("[FTP] 농장 " + farmName + "에 파일이 없습니다.");
+                                    }
+                                }
                             }
+                        } else {
+                            System.out.println("[FTP] " + FTP_MODEM_PATH + "에 농장 디렉토리가 없습니다.");
                         }
+                    } catch (IOException e) {
+                        System.err.println("[FTP] 모뎀 디렉토리 처리 오류: " + e.getMessage());
+                        e.printStackTrace();
                     }
-                    return true;
-                } catch (IOException e) {
+
+                    return anySuccess;
+                } catch (Exception e) {
+                    System.err.println("[FTP] 처리 중 오류 발생: " + e.getMessage());
                     e.printStackTrace();
                 } finally {
                     ftpService.disconnect();
                 }
+            } else {
+                System.err.println("[FTP] 연결 또는 로그인 실패");
+                System.err.println("[FTP] 응답 코드: " + ftpService.getServerReplyCode() + ", 메시지: " + ftpService.getLastServerResponse());
             }
 
             System.err.println("[FTP] 실패, " + RETRY_DELAY_MS / 1000 + "초 후 재시도");
@@ -122,10 +250,27 @@ public class Catm1FTPLogFileProcessor {
 
     private void convertAllLogFiles() {
         try {
-            Files.walk(Paths.get(LOCAL_SAVE_DIRECTORY))
+            System.out.println("[LOG] 모든 로그 파일 변환 시작");
+
+            // 로컬 디렉토리의 모든 .log 파일 리스트 (모든 하위 디렉토리 포함)
+            List<Path> logFiles = Files.walk(Paths.get(LOCAL_BASE_DIRECTORY))
                     .filter(Files::isRegularFile)
-                    .filter(p -> p.toString().endsWith(".log"))
-                    .forEach(logConverter::convertLogToCSV);
+                    .filter(p -> p.toString().toLowerCase().endsWith(".log"))
+                    .collect(Collectors.toList());
+
+            System.out.println("[LOG] 변환할 로그 파일 수: " + logFiles.size());
+
+            for (Path logFile : logFiles) {
+                try {
+                    System.out.println("[LOG] 파일 변환 시도: " + logFile);
+                    logConverter.convertLogToCSV(logFile);
+                } catch (Exception e) {
+                    System.err.println("[LOG] 파일 변환 오류: " + logFile);
+                    e.printStackTrace();
+                }
+            }
+
+            System.out.println("[LOG] 모든 로그 파일 변환 완료");
         } catch (IOException e) {
             System.err.println("[LOG] 변환 실패");
             e.printStackTrace();
@@ -134,16 +279,25 @@ public class Catm1FTPLogFileProcessor {
 
     private void processAllCSVFiles() {
         try {
-            List<Path> csvFiles = Files.walk(Paths.get(LOCAL_SAVE_DIRECTORY))
+            System.out.println("[CSV] 모든 CSV 파일 처리 시작");
+
+            // 모든 하위 디렉토리의 CSV 파일 검색
+            List<Path> csvFiles = Files.walk(Paths.get(LOCAL_BASE_DIRECTORY))
                     .filter(Files::isRegularFile)
-                    .filter(p -> p.toString().endsWith(".csv"))
+                    .filter(p -> p.toString().toLowerCase().endsWith(".csv"))
                     .collect(Collectors.toList());
+
+            System.out.println("[CSV] 처리할 CSV 파일 수: " + csvFiles.size());
 
             // 각 파일에 대해 isLatestFile 설정 (마지막 파일만 true)
             for(int i = 0; i < csvFiles.size(); i++) {
                 final boolean isLatestFile = (i == csvFiles.size() - 1);
-                csvProcessor.processCSVFile(csvFiles.get(i), isLatestFile);
+                Path csvFile = csvFiles.get(i);
+                System.out.println("[CSV] 파일 처리: " + csvFile + (isLatestFile ? " (최신 파일)" : ""));
+                csvProcessor.processCSVFile(csvFile, isLatestFile);
             }
+
+            System.out.println("[CSV] 모든 CSV 파일 처리 완료");
         } catch (IOException e) {
             System.err.println("[CSV] 처리 실패");
             e.printStackTrace();
